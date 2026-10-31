@@ -1,71 +1,59 @@
 import { lazy } from 'react';
-import { createBrowserRouter } from 'react-router-dom';
-import { AppShell, WorkspaceShell } from '@/components/layout/AppShell';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { AppShell, GameShell, WorkspaceShell } from '@/components/layout/AppShell';
 import { RouteError } from '@/pages/RouteError';
 import LandingPage from '@/pages/LandingPage';
 
-const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
+const MapPage = lazy(() => import('@/pages/MapPage'));
+const ZonePage = lazy(() => import('@/pages/ZonePage'));
+const PlayPage = lazy(() => import('@/pages/PlayPage'));
+const BossPage = lazy(() => import('@/pages/BossPage'));
+const QuestsPage = lazy(() => import('@/pages/QuestsPage'));
+const BadgesPage = lazy(() => import('@/pages/BadgesPage'));
 const WorldPage = lazy(() => import('@/pages/WorldPage'));
-const CoursesPage = lazy(() => import('@/pages/CoursesPage'));
-const CoursePage = lazy(() => import('@/pages/CoursePage'));
-const LessonPage = lazy(() => import('@/pages/LessonPage'));
-const ExercisePage = lazy(() => import('@/pages/ExercisePage'));
 const PlaygroundPage = lazy(() => import('@/pages/PlaygroundPage'));
-const MissionsPage = lazy(() => import('@/pages/MissionsPage'));
-const AchievementsPage = lazy(() => import('@/pages/AchievementsPage'));
-const ProgressPage = lazy(() => import('@/pages/ProgressPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
-const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout'));
-const AdminOverviewPage = lazy(() => import('@/pages/admin/AdminOverviewPage'));
-const AdminCoursesPage = lazy(() => import('@/pages/admin/AdminCoursesPage'));
-const AdminCourseEditPage = lazy(() => import('@/pages/admin/AdminCourseEditPage'));
-const AdminLessonEditPage = lazy(() => import('@/pages/admin/AdminLessonEditPage'));
-const AdminExerciseEditPage = lazy(() => import('@/pages/admin/AdminExerciseEditPage'));
-const AdminAchievementsPage = lazy(() => import('@/pages/admin/AdminAchievementsPage'));
-const AdminMissionsPage = lazy(() => import('@/pages/admin/AdminMissionsPage'));
+
+/** Old links (previous course-based version) lead somewhere sensible. */
+const redirects = ['/dashboard', '/courses/*', '/courses', '/missions', '/progress', '/practice/*', '/admin/*'].map((path) => ({
+  path,
+  element: <Navigate to={path.startsWith('/missions') ? '/quests' : '/map'} replace />,
+}));
 
 export const router = createBrowserRouter(
   [
     { path: '/', element: <LandingPage />, errorElement: <RouteError /> },
     { path: '/world', element: <WorldPage />, errorElement: <RouteError /> },
     {
-      element: <WorkspaceShell />,
+      element: <GameShell />,
       errorElement: <RouteError />,
       children: [
-        { path: '/practice/:exerciseId', element: <ExercisePage /> },
-        { path: '/playground', element: <PlaygroundPage /> },
+        { path: '/play/:stageId', element: <PlayPage /> },
+        { path: '/boss/:zoneId', element: <BossPage /> },
       ],
+    },
+    {
+      element: <WorkspaceShell />,
+      errorElement: <RouteError />,
+      children: [{ path: '/lab', element: <PlaygroundPage /> }],
     },
     {
       element: <AppShell />,
       errorElement: <RouteError />,
       children: [
-        { path: '/dashboard', element: <DashboardPage /> },
-        { path: '/courses', element: <CoursesPage /> },
-        { path: '/courses/:courseId', element: <CoursePage /> },
-        { path: '/courses/:courseId/lessons/:lessonId', element: <LessonPage /> },
-        { path: '/missions', element: <MissionsPage /> },
-        { path: '/achievements', element: <AchievementsPage /> },
-        { path: '/progress', element: <ProgressPage /> },
+        { path: '/map', element: <MapPage /> },
+        { path: '/zone/:zoneId', element: <ZonePage /> },
+        { path: '/quests', element: <QuestsPage /> },
+        { path: '/badges', element: <BadgesPage /> },
         { path: '/leaderboard', element: <LeaderboardPage /> },
         { path: '/settings', element: <SettingsPage /> },
         { path: '/profile', element: <ProfilePage /> },
-        {
-          path: '/admin',
-          element: <AdminLayout />,
-          children: [
-            { index: true, element: <AdminOverviewPage /> },
-            { path: 'courses', element: <AdminCoursesPage /> },
-            { path: 'courses/:courseId', element: <AdminCourseEditPage /> },
-            { path: 'lessons/:lessonId', element: <AdminLessonEditPage /> },
-            { path: 'exercises/:exerciseId', element: <AdminExerciseEditPage /> },
-            { path: 'achievements', element: <AdminAchievementsPage /> },
-            { path: 'missions', element: <AdminMissionsPage /> },
-          ],
-        },
+        { path: '/playground', element: <Navigate to="/lab" replace /> },
+        { path: '/achievements', element: <Navigate to="/badges" replace /> },
+        ...redirects,
         { path: '*', element: <NotFoundPage /> },
       ],
     },

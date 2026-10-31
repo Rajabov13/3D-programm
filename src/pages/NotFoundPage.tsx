@@ -1,22 +1,22 @@
-import { Compass } from 'lucide-react';
+import { Compass, Map as MapIcon } from 'lucide-react';
 import { ButtonLink } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/Feedback';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useT } from '@/i18n';
 
 export default function NotFoundPage() {
-  useDocumentTitle('Not found');
+  const t = useT();
+  useDocumentTitle(t('common.notFound'));
   return (
     <EmptyState
       className="mx-auto max-w-xl"
-      icon={<Compass className="h-8 w-8" />}
+      icon={<Compass className="h-10 w-10" />}
       headingLevel="h1"
-        title="This street isn’t on the map"
-      description="The page you’re looking for doesn’t exist or was moved."
+      title={t('common.notFound')}
       action={
-        <div className="flex gap-2">
-          <ButtonLink to="/dashboard">Dashboard</ButtonLink>
-          <ButtonLink to="/world" variant="secondary">Open the world map</ButtonLink>
-        </div>
+        <ButtonLink to="/map" icon={<MapIcon className="h-4 w-4" />}>
+          {t('play.toMap')}
+        </ButtonLink>
       }
     />
   );

@@ -5,7 +5,6 @@ import * as THREE from 'three';
 import { useBackingMaterial, useGlowMaterial, useSignTextMaterial } from './materials';
 
 export const FONT_URL = '/fonts/inter-600.woff';
-export const FONT_BOLD_URL = '/fonts/inter-700.woff';
 export const MONO_FONT_URL = '/fonts/jetbrains-mono-500.woff';
 
 /** Floating holographic name plate in front of a building. */

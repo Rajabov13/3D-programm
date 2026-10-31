@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { CodeLanguage } from '@/types';
+export type CodeLanguage = 'html' | 'css' | 'javascript' | 'python' | 'jsx' | 'bash' | 'text';
 
 /**
  * Tiny, dependency-free highlighter for read-only lesson snippets.

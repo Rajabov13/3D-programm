@@ -2,7 +2,7 @@
   "name": "3d-code-world",
   "private": true,
   "version": "1.0.0",
-  "description": "3D Code World (demo version) \u2014 learn programming by exploring an interactive 3D technology city.",
+  "description": "3D Code World (demo version) — learn programming by exploring an interactive 3D technology city.",
   "type": "module",
   "engines": {
     "node": ">=20.11"
@@ -15,7 +15,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify:exercises": "node scripts/verify-exercises.cjs",
+    "verify:bosses": "node scripts/verify-bosses.cjs",
     "smoke": "node scripts/smoke-test.cjs",
     "postinstall": "node scripts/copy-pyodide.mjs",
     "prebuild": "node scripts/copy-pyodide.mjs"
@@ -26,7 +26,6 @@
     "@monaco-editor/react": "4.7.0",
     "@react-three/drei": "9.122.0",
     "@react-three/fiber": "8.18.0",
-    "@tanstack/react-query": "5.62.8",
     "acorn": "8.14.0",
     "acorn-walk": "8.3.4",
     "clsx": "2.1.1",

@@ -5,43 +5,74 @@
 ```
 Browser (React 18 + Vite) — no backend
  ├─ Pages & UI (Tailwind)          src/pages, src/components
+ ├─ i18n (uz · ru · en)            src/i18n            — typed dictionaries + tx() for content
+ ├─ Game                           src/game            — content, rules engine, zustand store, sounds
  ├─ 3D city (R3F + drei + three)   src/three           — lazy chunk, only on / and /world
- ├─ Workspace (Monaco)             src/editor          — lazy chunk, only on editor pages
+ ├─ Workspace (Monaco)             src/editor          — lazy chunk, only on boss and lab pages
  │   └─ Sandboxes                  src/editor/sandbox  — opaque-origin iframes + workers
  ├─ Check engine                   src/shared/checks.ts
- ├─ Data layer (TanStack Query)
- │   ├─ Content                    bundled src/data + admin edits in localStorage
- │   └─ Progress                   rules engine (src/features/progress/engine.ts) + localStorage
- └─ Profile                        display name, avatar, leaderboard opt-in (localStorage)
+ └─ Profile                        display name, avatar, leaderboard opt-in
 ```
 
 All state is per browser:
 
 | Key | Contents |
 |---|---|
-| `cw.demo.progress.v1` | XP, completed lessons/exercises, quiz results, missions, achievements, XP history, daily activity, daily goal, time zone |
+| `cw.game.v1` | XP, best stars per stage, defeated bosses, badges, claimed quests, XP ledger and history, per-day stats |
+| `cw.lang.v1` | Interface language (`uz` default; first visit follows the browser language) |
 | `cw.demo.profile.v1` | Display name, avatar, leaderboard opt-in |
-| `cw.demo.content.v1` | Only present after admin edits; otherwise the bundled catalog is used |
-| `cw.settings.v1` | Graphics quality, motion, editor and camera preferences |
-| `cw.draft.*` | Unsaved code per exercise / playground mode |
+| `cw.settings.v1` | Sound, graphics quality, motion, editor and camera preferences |
+| `cw.draft.*` | Code per boss / lab mode |
 
-## Progression rules
+## Routes
 
-`src/features/progress/engine.ts` contains pure functions, covered by `engine.test.ts`:
+| Route | Page |
+|---|---|
+| `/` | Landing |
+| `/map` | Player strip, “continue” button, today’s quests, world cards |
+| `/zone/:zoneId` | Stage path of a world (zig-zag nodes with stars) and the boss node |
+| `/play/:stageId` | Full-screen mini-game run (tip → tasks → result) |
+| `/boss/:zoneId` | Boss fight: task + requirement checklist + editor/preview/console |
+| `/quests`, `/badges`, `/leaderboard`, `/profile`, `/settings`, `/lab`, `/world` | Hub pages, code lab, 3D city |
+
+Links from the earlier course-based version (`/dashboard`, `/courses/*`, `/missions`, …) redirect to the map.
+
+## Game rules
+
+`src/game/engine.ts` contains pure functions over a serialisable `GameState`, covered by `engine.test.ts`:
 
 - Level curve: total XP to reach level *L* is `25·(L−1)·(L+2)` (100, 250, 450, 700, …).
-- A lesson completes only after its knowledge check is passed (≥ 60 %) and all its exercises pass.
-- XP is recorded as transactions keyed by `(source type, source id)` — the same lesson, exercise,
-  quiz, mission or achievement never awards XP twice.
-- Daily goal: reaching the goal awards +10 XP once per day; streaks count consecutive active days
-  in the learner’s time zone.
-- Achievements are evaluated after every award; missions are claimed explicitly once met.
-- Courses unlock by level (HTML 1, CSS 2, Python 2, JavaScript 3, React 5).
-- Wrong quiz answers don’t reveal the correct options until the check is passed.
+- Worlds unlock by level (HTML 1, CSS 2, Python 2, JavaScript 3, React 4); stages unlock in order;
+  the boss unlocks when every stage of its world is cleared.
+- A stage is cleared with fewer than 3 mistakes. Stars: 0 mistakes → 3, 1 → 2, 2 → 1. A wrong task
+  is repeated once at the end of the run.
+- XP: +10 first clear, +10 per new best star (max 40 per stage), boss XP once per world, badge XP when
+  earned, quest XP when claimed. Every reward goes through an idempotency ledger
+  (`stage:id`, `stage:id:starN`, `boss:zone`, `badge:id`, `quest:day:id`), so nothing pays twice.
+- Daily quests and the streak use the local calendar day.
+
+## Content format
+
+`src/game/content/<world>.ts` — each world has 5 stages (tip + 6 tasks) and a boss. Code and options are
+language-neutral; translated text uses `tx(uz, ru, en)`. Task kinds:
+
+| Kind | Fields |
+|---|---|
+| `pick` | `q` (translated), `code?`, `options`, `answer` |
+| `output` | `code`, `lang`, `options` (possible outputs), `answer` |
+| `blank` | `code` with one `___`, `options`, `answer` |
+| `order` | `lines` in the correct order (shown shuffled) |
+| `bug` | `lines`, `bug` (index of the broken line), `fix` (shown afterwards) |
+| `match` | `pairs` of `[code, meaning]` (optionally verified as JS/Python expressions in tests) |
+| `look` | `code` (CSS), `preview` kind, `options` (style objects rendered as previews), `answer` |
+
+`content.dom.test.ts` executes every JavaScript/Python `output` task and expression `match` pair to prove the
+answer keys are right, checks translations are complete, runs every boss solution (and starter) through the
+check engine, and makes sure building names only use glyphs the bundled 3D font covers.
 
 ## Check engine
 
-`src/shared/checks.ts` evaluates exercise checks without ever executing code — it inspects
+`src/shared/checks.ts` evaluates boss checks without ever executing code — it inspects
 comment-stripped source, parses HTML with a script-free `DOMParser`, parses CSS, and compares program
 output produced by the sandboxes. Check types:
 
@@ -63,38 +94,25 @@ Learner code only ever runs in isolated browser environments:
 
 | Sandbox | Used for | Isolation |
 |---|---|---|
-| Preview iframe | HTML/CSS/JS and React exercises, live preview | `sandbox="allow-scripts"` without `allow-same-origin` → opaque origin (no access to the app’s storage or DOM). In-document CSP blocks all network. Loops are instrumented (`loopProtect.ts`) and stopped after 1.5 s; `alert/confirm/prompt`, navigation and form submission are neutralised. |
-| Web Worker in a sandboxed iframe | JavaScript console exercises | Same opaque origin + CSP; `fetch`, `XMLHttpRequest`, `WebSocket`, `importScripts` disabled; the worker is hard-terminated after 4 s; output capped at 200 KB. |
+| Preview iframe | HTML/CSS and React bosses, lab preview | `sandbox="allow-scripts"` without `allow-same-origin` → opaque origin (no access to the app’s storage or DOM). In-document CSP blocks all network. Loops are instrumented (`loopProtect.ts`) and stopped after 1.5 s; `alert/confirm/prompt`, navigation and form submission are neutralised. |
+| Web Worker in a sandboxed iframe | JavaScript boss and lab | Same opaque origin + CSP; `fetch`, `XMLHttpRequest`, `WebSocket`, `importScripts` disabled; the worker is hard-terminated after 4 s; output capped at 200 KB. |
 | Pyodide in a Worker in a sandboxed iframe | Python | Opaque origin; network limited to the Pyodide directory; fresh global namespace per run; terminated after 10 s (restarts on next run). |
 
-React exercises are transformed with Sucrase in the app and executed in the preview with React 18
+React code is transformed with Sucrase in the app and executed in the preview with React 18
 UMD builds bundled locally. Errors are reported with script-relative line numbers; Python
 tracebacks hide interpreter-internal frames.
 
-## Lesson content format
-
-`lesson.blocks` is an array of:
-
-```json
-{ "type": "text", "md": "Markdown with `code`, **bold**, *italic*, [links](https://…), lists" }
-{ "type": "heading", "text": "Section title" }
-{ "type": "code", "language": "html|css|javascript|python|jsx|bash|text", "code": "…", "caption": "optional" }
-{ "type": "callout", "variant": "tip|info|warning", "title": "optional", "md": "…" }
-```
-
-Markdown is rendered by a small built-in renderer that produces React elements (raw HTML in
-content is shown as text). Code blocks get a “Try it” button that opens the snippet in the playground.
-
 ## The 3D city
 
-- `src/data/buildings.ts` — positions, collision radii, shapes, routes. Buildings face the central plaza.
+- `src/data/buildings.ts` — positions, collision radii, shapes, routes, translated name keys. Buildings face the central plaza.
 - `src/three/CityScene.tsx` — sky, stars, lighting (≤ 1 shadow-casting light + 2 point lights), the
   single-draw-call ground shader (grid, plaza rings, roads, fog), the instanced skyline (one draw call),
   drones (one instanced draw call), the plaza monument, landmarks and floating glyphs.
 - Materials and canvas-generated window textures are shared through a context and disposed on
   unmount/quality change. Reflections come from a procedural `Environment` rendered once (no HDR download).
-- Text uses troika with bundled fonts in `public/fonts` (Latin-1 only — a test guards this so troika
-  never fetches fallback fonts from a CDN).
+- 3D sign text uses troika with the bundled full Inter font in `public/fonts` (Latin incl. Uzbek ʻ ʼ and
+  Cyrillic — a test guards this so troika never fetches fallback fonts from a CDN). Signs re-render when
+  the language changes.
 - **Quality presets** (`src/three/quality.ts`): `high`/`medium`/`low`/`2d`; `auto` picks from cores,
   memory and pointer type, then `PerformanceMonitor` adapts the pixel ratio at runtime.
 - **Controls**: `OverviewControls` (smooth fly-to), `WalkController` (WASD/arrows, Shift to run, pointer
@@ -129,16 +147,18 @@ origin. If you load Pyodide from a CDN, add its URL to `script-src` and `connect
 
 ## Moving beyond the demo
 
-A production version would add a backend for accounts and persistence, store progress server-side,
-re-verify exercise submissions there (the check engine is reusable as-is), run Python/JS output checks
-on an isolated execution service, and protect the admin area with server-side authorization.
+A production version would add a backend for accounts and persistence, store game progress server-side,
+re-verify boss solutions there (the check engine is reusable as-is), and run Python/JS output checks on an
+isolated execution service.
 
 ## Extending
 
-- **New course**: add a draft in `src/data/courses/`, register it in `src/data/index.ts`, map it to a
-  building, and run `npm test` (content integrity). Or create it in the admin area.
-- **New building**: add it to `src/data/buildings.ts` and a shape in `src/three/buildings/shapes.tsx`.
+- **New stage or task**: add it to `src/game/content/<world>.ts` and run `npm test` — the content tests
+  execute the answers and check translations.
+- **New world**: add a `Zone` file, register it in `src/game/content/index.ts`, add a building in
+  `src/data/buildings.ts` (+ a shape in `src/three/buildings/shapes.tsx`) and its `b.*`/`bd.*` names in
+  the three dictionaries.
+- **New UI text**: add the key to `src/i18n/uz.ts` — TypeScript then requires it in `ru.ts` and `en.ts`.
+- **New language**: add a dictionary, extend `Lang`/`LANGS` and the `tx()` signature.
 - **New check type**: extend `CheckSpec`, `evaluateCheck`, `validateCheckSpecs` and (for runtime
   checks) `src/editor/sandbox/bridge.ts`.
-- **New language**: add an `ExerciseMode`, a runner in `src/editor/sandbox`, and file tabs in
-  `src/editor/files.ts`.

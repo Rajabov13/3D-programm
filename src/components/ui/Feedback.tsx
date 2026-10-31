@@ -1,19 +1,22 @@
 import type { ReactNode } from 'react';
 import { CircleAlert, LoaderCircle, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { useT } from '@/i18n';
 import { errorMessage } from '@/lib/errors';
 import { Button } from './Button';
 
-export function Spinner({ className, label = 'Loading' }: { className?: string; label?: string }) {
+export function Spinner({ className, label }: { className?: string; label?: string }) {
+  const t = useT();
   return (
     <span role="status" className={cn('inline-flex items-center gap-2 text-slate-400', className)}>
       <LoaderCircle className="h-4 w-4 animate-spin text-cyan-300" aria-hidden />
-      <span className="sr-only">{label}</span>
+      <span className="sr-only">{label ?? t('common.loading')}</span>
     </span>
   );
 }
 
-export function PageLoader({ label = 'Loading…' }: { label?: string }) {
+export function PageLoader({ label }: { label?: string }) {
+  const t = useT();
   return (
     <div className="grid min-h-[50vh] place-items-center" role="status" aria-live="polite">
       <div className="flex flex-col items-center gap-4">
@@ -21,7 +24,7 @@ export function PageLoader({ label = 'Loading…' }: { label?: string }) {
           <div className="absolute inset-0 animate-ping rounded-full bg-cyan-400/20" />
           <div className="absolute inset-2 animate-spin rounded-full border-2 border-cyan-300/80 border-t-transparent" />
         </div>
-        <p className="text-sm text-slate-400">{label}</p>
+        <p className="text-sm text-slate-400">{label ?? t('common.loading')}</p>
       </div>
     </div>
   );
@@ -53,15 +56,16 @@ export function EmptyState({
   );
 }
 
-export function ErrorState({ error, title = 'Something went wrong', onRetry, className }: { error?: unknown; title?: string; onRetry?: () => void; className?: string }) {
+export function ErrorState({ error, title, onRetry, className }: { error?: unknown; title?: string; onRetry?: () => void; className?: string }) {
+  const t = useT();
   return (
     <div role="alert" className={cn('flex flex-col items-center rounded-2xl border border-rose-400/20 bg-rose-500/[0.06] px-6 py-10 text-center', className)}>
       <CircleAlert className="mb-3 h-7 w-7 text-rose-300" aria-hidden />
-      <h3 className="text-base text-white">{title}</h3>
+      <h3 className="text-base text-white">{title ?? t('common.error')}</h3>
       {error !== undefined && <p className="mt-1.5 max-w-lg text-sm text-rose-100/80">{errorMessage(error)}</p>}
       {onRetry && (
         <Button variant="secondary" size="sm" className="mt-5" onClick={onRetry} icon={<RefreshCw className="h-3.5 w-3.5" />}>
-          Try again
+          {t('common.retry')}
         </Button>
       )}
     </div>

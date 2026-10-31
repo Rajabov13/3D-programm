@@ -1,3 +1,4 @@
+import { tNow } from '@/i18n';
 import { HostFrame } from './hostFrame';
 import { newRunId, type ConsoleEntry, type RunResult } from './types';
 
@@ -162,7 +163,7 @@ export async function runJavaScript(code: string, { timeoutMs = 4000, onConsole 
         if (msg.status === 'timeout') {
           onConsole?.({
             level: 'system',
-            text: `Stopped after ${timeoutMs / 1000}s — the program was still running (an infinite loop, or timers that never stop).`,
+            text: tNow('console.timeout', { s: timeoutMs / 1000 }),
           });
         }
         resolve({ status: msg.status, stdout: stdout.join('\n'), durationMs, message: msg.message });

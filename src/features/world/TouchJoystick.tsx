@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react';
+import { useT } from '@/i18n';
 import { touchInput } from '@/three/worldStore';
 
 /** On-screen joystick for touch devices; writes to a non-reactive input channel read each frame. */
 export function TouchJoystick() {
+  const t = useT();
   const base = useRef<HTMLDivElement>(null);
   const [knob, setKnob] = useState({ x: 0, y: 0 });
   const pointer = useRef<number | null>(null);
@@ -32,7 +34,7 @@ export function TouchJoystick() {
     <div
       ref={base}
       role="application"
-      aria-label="Movement joystick"
+      aria-label={t('world.joystick')}
       className="pointer-events-auto relative h-32 w-32 touch-none select-none rounded-full border border-white/15 bg-night-900/50 backdrop-blur"
       onPointerDown={(e) => {
         e.stopPropagation();

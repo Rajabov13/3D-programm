@@ -22,8 +22,8 @@ export const MODE_FILES: Record<ExerciseMode, FileTab[]> = {
 };
 
 export const MODE_LABELS: Record<ExerciseMode, string> = {
-  web: 'HTML · CSS · JS (live preview)',
-  console: 'JavaScript (console)',
+  web: 'HTML · CSS · JS',
+  console: 'JavaScript',
   python: 'Python',
   react: 'React (JSX)',
 };

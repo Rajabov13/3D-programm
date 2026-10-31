@@ -1,7 +1,7 @@
 import { useCallback, useEffect, type MutableRefObject } from 'react';
 import * as THREE from 'three';
 import { buildings } from '@/data/buildings';
-import type { BuildingId } from '@/types';
+import type { BuildingId } from '@/data/buildings';
 import { FOG_COLOR, Lighting, Sky, Stars } from './Atmosphere';
 import { Building, type BuildingStatus } from './buildings/Building';
 import { Drones } from './Drones';

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { buildingById, buildings, entrancePoint, SPAWN, WORLD_RADIUS } from '@/data/buildings';
-import type { BuildingId } from '@/types';
+import type { BuildingId } from '@/data/buildings';
 import { nearestWithin, resolveCollisions, type Collider } from '../collision';
 import { PLAZA_CORE_RADIUS } from '../PlazaCore';
 import { touchInput, useWorld } from '../worldStore';

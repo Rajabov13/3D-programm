@@ -4,6 +4,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
+import { useT, type DictKey } from '@/i18n';
 import { cn } from '@/lib/cn';
 import { config } from '@/services/config';
 import type { ExerciseFiles, ExerciseMode, FileKey } from '@shared/checks';
@@ -36,18 +37,19 @@ export interface WorkspaceProps {
   storageKey: string;
 }
 
-const SHORTCUTS: Array<[string, string]> = [
-  ['Ctrl/⌘ + Enter', 'Run'],
-  ['Ctrl/⌘ + Shift + Enter', 'Check solution'],
-  ['Ctrl/⌘ + S', 'Run (your work is saved automatically)'],
-  ['Ctrl + M', 'Toggle “Tab moves focus” in the editor (keyboard users)'],
-  ['F1', 'Editor command palette'],
-  ['Ctrl/⌘ + F', 'Find in file'],
-  ['Arrow keys on a divider', 'Resize panels'],
+const SHORTCUTS: Array<[string, DictKey]> = [
+  ['Ctrl/⌘ + Enter', 'editor.sc.run'],
+  ['Ctrl/⌘ + Shift + Enter', 'editor.sc.check'],
+  ['Ctrl/⌘ + S', 'editor.sc.save'],
+  ['Ctrl + M', 'editor.sc.tab'],
+  ['F1', 'editor.sc.palette'],
+  ['Ctrl/⌘ + F', 'editor.sc.find'],
+  ['← → ↑ ↓', 'editor.sc.resize'],
 ];
 
 export function Workspace(props: WorkspaceProps) {
   const { mode, files, onFileChange, runner, onRun, onReset, onCheck, checking, checksPanel, checksSignal, sidebar, toolbarStart, stdin, onStdinChange, storageKey } = props;
+  const t = useT();
   const desktop = useIsDesktop();
   const tabs = MODE_FILES[mode];
   const [activeFile, setActiveFile] = useState<FileKey>(tabs[0].key);
@@ -98,7 +100,7 @@ export function Workspace(props: WorkspaceProps) {
   const current = tabs.find((t) => t.key === activeFile) ?? tabs[0];
   const editor = (
     <div className="flex h-full min-h-0 flex-col bg-[#070c17]">
-      <div role="tablist" aria-label="Files" className="flex shrink-0 items-center gap-0.5 overflow-x-auto border-b border-white/[0.06] bg-night-900/80 px-1.5 no-scrollbar">
+      <div role="tablist" aria-label={t('editor.files')} className="flex shrink-0 items-center gap-0.5 overflow-x-auto border-b border-white/[0.06] bg-night-900/80 px-1.5 no-scrollbar">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -117,7 +119,7 @@ export function Workspace(props: WorkspaceProps) {
       </div>
       <div className="min-h-0 flex-1">
         <ErrorBoundary
-          fallback={() => <FallbackEditor value={files[current.key] ?? ''} onChange={(v) => onFileChange(current.key, v)} ariaLabel={`${current.name} editor`} />}
+          fallback={() => <FallbackEditor value={files[current.key] ?? ''} onChange={(v) => onFileChange(current.key, v)} ariaLabel={`${current.name} — ${t('editor.code')}`} />}
         >
           <CodeEditor
             key={`${storageKey}:${current.key}`}
@@ -125,7 +127,7 @@ export function Workspace(props: WorkspaceProps) {
             language={current.language}
             value={files[current.key] ?? ''}
             onChange={(v) => onFileChange(current.key, v)}
-            ariaLabel={`${current.name} code editor`}
+            ariaLabel={`${current.name} — ${t('editor.code')}`}
             onRun={run}
             onCheck={onCheck}
           />
@@ -137,16 +139,16 @@ export function Workspace(props: WorkspaceProps) {
   const outputTabs = useMemo(
     () =>
       [
-        hasPreview && { id: 'preview' as const, label: 'Preview', icon: MonitorPlay },
-        { id: 'console' as const, label: 'Console', icon: Terminal },
-        checksPanel && { id: 'checks' as const, label: 'Checks', icon: ListChecks },
+        hasPreview && { id: 'preview' as const, label: t('editor.preview'), icon: MonitorPlay },
+        { id: 'console' as const, label: t('editor.console'), icon: Terminal },
+        checksPanel && { id: 'checks' as const, label: t('editor.checks'), icon: ListChecks },
       ].filter(Boolean) as Array<{ id: OutputTab; label: string; icon: typeof Terminal }>,
-    [hasPreview, checksPanel],
+    [hasPreview, checksPanel, t],
   );
 
   const output = (
     <div className="flex h-full min-h-0 flex-col bg-night-950">
-      <div role="tablist" aria-label="Output" className="flex shrink-0 items-center gap-0.5 border-b border-white/[0.06] bg-night-900/80 px-1.5">
+      <div role="tablist" aria-label={t('editor.output')} className="flex shrink-0 items-center gap-0.5 border-b border-white/[0.06] bg-night-900/80 px-1.5">
         {outputTabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
@@ -161,12 +163,12 @@ export function Workspace(props: WorkspaceProps) {
           >
             <Icon className="h-3.5 w-3.5" aria-hidden />
             {label}
-            {id === 'console' && runner.entries.some((e) => e.level === 'error') && <span className="h-1.5 w-1.5 rounded-full bg-rose-400" aria-label="has errors" />}
+            {id === 'console' && runner.entries.some((e) => e.level === 'error') && <span className="h-1.5 w-1.5 rounded-full bg-rose-400" aria-label={t('editor.hasErrors')} />}
           </button>
         ))}
         {runner.lastRun && (
           <span className="ml-auto pr-2 text-[11px] text-slate-500">
-            {runner.lastRun.status === 'ok' ? 'Finished' : runner.lastRun.status === 'timeout' ? 'Stopped' : runner.lastRun.status === 'unavailable' ? 'Not run' : 'Error'}
+            {t(runner.lastRun.status === 'ok' ? 'editor.s.ok' : runner.lastRun.status === 'timeout' ? 'editor.s.timeout' : runner.lastRun.status === 'unavailable' ? 'editor.s.unavailable' : 'editor.s.error')}
             {runner.lastRun.durationMs !== undefined && ` · ${runner.lastRun.durationMs} ms`}
           </span>
         )}
@@ -174,17 +176,17 @@ export function Workspace(props: WorkspaceProps) {
       <div className="relative min-h-0 flex-1">
         {hasPreview && (
           <div className={cn('absolute inset-0', outputTab !== 'preview' && 'invisible')}>
-            <PreviewFrame ref={runner.previewRef} doc={runner.preview?.doc ?? null} runId={runner.preview?.runId ?? null} onConsole={runner.push} title="Live preview of your code" />
+            <PreviewFrame ref={runner.previewRef} doc={runner.preview?.doc ?? null} runId={runner.preview?.runId ?? null} onConsole={runner.push} title={t('editor.previewTitle')} />
           </div>
         )}
         <div className={cn('absolute inset-0 flex flex-col', outputTab !== 'console' && 'invisible')}>
           <div className="min-h-0 flex-1">
-            <ConsolePanel entries={runner.entries} onClear={runner.clear} emptyHint={hasPreview ? 'console.log output from your page appears here.' : 'Press Run (Ctrl/⌘ + Enter) to execute your program.'} />
+            <ConsolePanel entries={runner.entries} onClear={runner.clear} emptyHint={t('editor.emptyConsole')} />
           </div>
           {mode === 'python' && onStdinChange && (
             <div className="border-t border-white/[0.06] p-2">
               <label htmlFor={`${storageKey}-stdin`} className="mb-1 block text-[11px] font-medium text-slate-400">
-                Program input (one line per input() call)
+                {t('editor.stdin')}
               </label>
               <textarea
                 id={`${storageKey}-stdin`}
@@ -208,21 +210,21 @@ export function Workspace(props: WorkspaceProps) {
         {mode === 'python' && config.pythonRunner === 'pyodide' && (python.state === 'loading' || python.state === 'error') && (
           <span className={cn('inline-flex items-center gap-1.5 text-[11px]', python.state === 'error' ? 'text-rose-300' : 'text-slate-400')} role="status">
             {python.state === 'loading' ? <LoaderCircle className="h-3 w-3 animate-spin" aria-hidden /> : <Cpu className="h-3 w-3" aria-hidden />}
-            {python.state === 'loading' ? 'Loading Python runtime…' : 'Python runtime failed to load'}
+            {python.state === 'loading' ? t('editor.pyLoading') : t('editor.pyFailed')}
           </span>
         )}
-        <Button variant="ghost" size="icon" onClick={() => setShowShortcuts(true)} aria-label="Keyboard shortcuts" title="Keyboard shortcuts">
+        <Button variant="ghost" size="icon" onClick={() => setShowShortcuts(true)} aria-label={t('editor.shortcuts')} title={t('editor.shortcuts')}>
           <Keyboard className="h-4 w-4" />
         </Button>
         <Button variant="secondary" size="sm" onClick={() => setConfirmReset(true)} icon={<RotateCcw className="h-3.5 w-3.5" />}>
-          Reset
+          <span className="hidden sm:inline">{t('common.reset')}</span>
         </Button>
-        <Button variant="secondary" size="sm" onClick={run} loading={runner.running && !checking} icon={<Play className="h-3.5 w-3.5" />} title="Run (Ctrl/⌘ + Enter)">
-          Run
+        <Button variant="secondary" size="sm" onClick={run} loading={runner.running && !checking} icon={<Play className="h-3.5 w-3.5" />} title="Ctrl/⌘ + Enter">
+          {t('common.run')}
         </Button>
         {onCheck && (
-          <Button size="sm" onClick={onCheck} loading={checking} icon={<ShieldCheck className="h-3.5 w-3.5" />} title="Check solution (Ctrl/⌘ + Shift + Enter)">
-            Check
+          <Button size="sm" onClick={onCheck} loading={checking} icon={<ShieldCheck className="h-3.5 w-3.5" />} title="Ctrl/⌘ + Shift + Enter">
+            {t('common.check')}
           </Button>
         )}
       </div>
@@ -234,13 +236,13 @@ export function Workspace(props: WorkspaceProps) {
       <Modal
         open={confirmReset}
         onClose={() => setConfirmReset(false)}
-        title="Reset to the starter code?"
-        description="Your current changes in every file will be replaced. This can’t be undone."
+        title={t('editor.resetTitle')}
+        description={t('editor.resetBody')}
         size="sm"
         footer={
           <>
             <Button variant="secondary" onClick={() => setConfirmReset(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               variant="danger"
@@ -249,17 +251,17 @@ export function Workspace(props: WorkspaceProps) {
                 onReset();
               }}
             >
-              Reset code
+              {t('common.reset')}
             </Button>
           </>
         }
       />
-      <Modal open={showShortcuts} onClose={() => setShowShortcuts(false)} title="Keyboard shortcuts" size="md">
+      <Modal open={showShortcuts} onClose={() => setShowShortcuts(false)} title={t('editor.shortcuts')} size="md">
         <dl className="space-y-2 text-sm">
           {SHORTCUTS.map(([keys, action]) => (
             <div key={keys} className="flex justify-between gap-4 border-b border-white/[0.05] pb-2">
               <dt className="font-mono text-[12px] text-cyan-200">{keys}</dt>
-              <dd className="text-right text-slate-400">{action}</dd>
+              <dd className="text-right text-slate-400">{t(action)}</dd>
             </div>
           ))}
         </dl>
@@ -268,13 +270,13 @@ export function Workspace(props: WorkspaceProps) {
   );
 
   if (desktop) {
-    const main = <SplitPane first={editor} second={output} initial={0.55} min={0.25} max={0.8} storageKey={`${storageKey}-main`} label="Resize editor and output" />;
+    const main = <SplitPane first={editor} second={output} initial={0.55} min={0.25} max={0.8} storageKey={`${storageKey}-main`} label={t('editor.resize')} />;
     return (
       <div className="flex h-full min-h-0 flex-col">
         {toolbar}
         <div className="min-h-0 flex-1">
           {sidebar ? (
-            <SplitPane first={sidebar} second={main} initial={0.28} min={0.18} max={0.45} storageKey={`${storageKey}-side`} label="Resize instructions panel" />
+            <SplitPane first={sidebar} second={main} initial={0.28} min={0.18} max={0.45} storageKey={`${storageKey}-side`} label={t('editor.resize')} />
           ) : (
             main
           )}
@@ -285,23 +287,23 @@ export function Workspace(props: WorkspaceProps) {
   }
 
   const mobileTabs: Array<{ id: MobileTab; label: string }> = [
-    ...(sidebar ? [{ id: 'task' as const, label: 'Task' }] : []),
-    { id: 'code', label: 'Code' },
-    { id: 'output', label: 'Output' },
+    ...(sidebar ? [{ id: 'task' as const, label: t('editor.task') }] : []),
+    { id: 'code', label: t('editor.code') },
+    { id: 'output', label: t('editor.output') },
   ];
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div role="tablist" aria-label="Workspace sections" className="flex shrink-0 border-b border-white/[0.06] bg-night-900">
-        {mobileTabs.map((t) => (
+      <div role="tablist" aria-label={t('editor.files')} className="flex shrink-0 border-b border-white/[0.06] bg-night-900">
+        {mobileTabs.map((tab) => (
           <button
-            key={t.id}
+            key={tab.id}
             role="tab"
             type="button"
-            aria-selected={mobileTab === t.id}
-            onClick={() => setMobileTab(t.id)}
-            className={cn('focus-ring flex-1 py-2.5 text-sm font-medium', mobileTab === t.id ? 'border-b-2 border-cyan-300 text-white' : 'text-slate-500')}
+            aria-selected={mobileTab === tab.id}
+            onClick={() => setMobileTab(tab.id)}
+            className={cn('focus-ring flex-1 py-2.5 text-sm font-medium', mobileTab === tab.id ? 'border-b-2 border-cyan-300 text-white' : 'text-slate-500')}
           >
-            {t.label}
+            {tab.label}
           </button>
         ))}
       </div>

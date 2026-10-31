@@ -1,3 +1,4 @@
+import { tNow } from '@/i18n';
 import { config } from '@/services/config';
 import { HostFrame } from './hostFrame';
 import { newRunId, type ConsoleEntry, type RunResult } from './types';
@@ -205,7 +206,7 @@ class PyodideRunner {
           unsubscribe();
           if (msg.status === 'timeout') {
             this.readyPromise = null;
-            onConsole?.({ level: 'system', text: `Stopped after ${timeoutMs / 1000}s — the program was still running. The Python runtime will restart on the next run.` });
+            onConsole?.({ level: 'system', text: `${tNow('console.timeout', { s: timeoutMs / 1000 })} ${tNow('console.pyRestart')}` });
           }
           resolve({ status: msg.status, stdout: stdout.join('\n'), durationMs: Math.round(performance.now() - started) });
         }

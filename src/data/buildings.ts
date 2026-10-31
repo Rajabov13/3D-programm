@@ -1,15 +1,25 @@
-import type { BuildingId } from '@/types';
+import type { DictKey } from '@/i18n';
+
+export type BuildingId =
+  | 'html-academy'
+  | 'css-studio'
+  | 'js-lab'
+  | 'python-center'
+  | 'react-tower'
+  | 'mission-center'
+  | 'achievement-hall'
+  | 'progress-center';
 
 export type BuildingShape = 'stepped' | 'twisted' | 'lab' | 'twin' | 'spire' | 'hex' | 'hall' | 'dome';
-export type BuildingKind = 'course' | 'missions' | 'achievements' | 'progress';
+export type BuildingKind = 'zone' | 'missions' | 'achievements' | 'progress';
 
 export interface BuildingDef {
   id: BuildingId;
-  name: string;
+  nameKey: DictKey;
+  descKey: DictKey;
   kind: BuildingKind;
-  courseId?: string;
+  zoneId?: string;
   route: string;
-  description: string;
   /** World position on the ground plane (x, z). */
   position: [number, number];
   /** Collision radius on the ground plane. */
@@ -31,10 +41,10 @@ function polar(deg: number, r = RING): [number, number] {
 export const buildings: BuildingDef[] = [
   {
     id: 'progress-center',
-    name: 'Personal Progress Center',
+    nameKey: 'b.progress',
+    descKey: 'bd.progress',
     kind: 'progress',
-    route: '/progress',
-    description: 'Your personal command deck: levels, XP history, activity and course completion.',
+    route: '/profile',
     position: polar(0, 33),
     radius: 7.5,
     height: 16,
@@ -44,11 +54,11 @@ export const buildings: BuildingDef[] = [
   },
   {
     id: 'html-academy',
-    name: 'HTML Academy',
-    kind: 'course',
-    courseId: 'html',
-    route: '/courses/html',
-    description: 'Where every journey begins. Learn the structure of the web.',
+    nameKey: 'b.html',
+    descKey: 'bd.html',
+    kind: 'zone',
+    zoneId: 'html',
+    route: '/zone/html',
     position: polar(-45),
     radius: 6.2,
     height: 22,
@@ -58,11 +68,11 @@ export const buildings: BuildingDef[] = [
   },
   {
     id: 'css-studio',
-    name: 'CSS Design Studio',
-    kind: 'course',
-    courseId: 'css',
-    route: '/courses/css',
-    description: 'A twisting tower of colour, spacing and layout.',
+    nameKey: 'b.css',
+    descKey: 'bd.css',
+    kind: 'zone',
+    zoneId: 'css',
+    route: '/zone/css',
     position: polar(45),
     radius: 5.8,
     height: 24,
@@ -72,11 +82,11 @@ export const buildings: BuildingDef[] = [
   },
   {
     id: 'js-lab',
-    name: 'JavaScript Laboratory',
-    kind: 'course',
-    courseId: 'javascript',
-    route: '/courses/javascript',
-    description: 'Experiments in logic, events and asynchronous code.',
+    nameKey: 'b.js',
+    descKey: 'bd.js',
+    kind: 'zone',
+    zoneId: 'js',
+    route: '/zone/js',
     position: polar(-90),
     radius: 6,
     height: 20,
@@ -86,11 +96,11 @@ export const buildings: BuildingDef[] = [
   },
   {
     id: 'python-center',
-    name: 'Python Center',
-    kind: 'course',
-    courseId: 'python',
-    route: '/courses/python',
-    description: 'Twin towers of readable, powerful code.',
+    nameKey: 'b.python',
+    descKey: 'bd.python',
+    kind: 'zone',
+    zoneId: 'python',
+    route: '/zone/python',
     position: polar(90),
     radius: 7,
     height: 21,
@@ -100,11 +110,11 @@ export const buildings: BuildingDef[] = [
   },
   {
     id: 'react-tower',
-    name: 'React Development Tower',
-    kind: 'course',
-    courseId: 'react',
-    route: '/courses/react',
-    description: 'The tallest spire in the city — compose interfaces from components.',
+    nameKey: 'b.react',
+    descKey: 'bd.react',
+    kind: 'zone',
+    zoneId: 'react',
+    route: '/zone/react',
     position: polar(-135),
     radius: 5,
     height: 34,
@@ -114,10 +124,10 @@ export const buildings: BuildingDef[] = [
   },
   {
     id: 'mission-center',
-    name: 'Mission Center',
+    nameKey: 'b.missions',
+    descKey: 'bd.missions',
     kind: 'missions',
-    route: '/missions',
-    description: 'Pick up objectives and claim XP rewards for real progress.',
+    route: '/quests',
     position: polar(135),
     radius: 7,
     height: 12,
@@ -127,10 +137,10 @@ export const buildings: BuildingDef[] = [
   },
   {
     id: 'achievement-hall',
-    name: 'Achievement Hall',
+    nameKey: 'b.badges',
+    descKey: 'bd.badges',
     kind: 'achievements',
-    route: '/achievements',
-    description: 'Badges and trophies earned across Code World.',
+    route: '/badges',
     position: polar(180, 36),
     radius: 7.5,
     height: 11,

@@ -1,83 +1,69 @@
-import { Crown, ShieldCheck } from 'lucide-react';
+import { Crown, Medal } from 'lucide-react';
 import { Avatar } from '@/components/ui/Avatar';
-import { Switch } from '@/components/ui/Field';
-import { EmptyState, ErrorState, InlineAlert, PageLoader } from '@/components/ui/Feedback';
-import { PageHeader, Panel } from '@/components/ui/Panel';
-import { toast } from '@/components/ui/toast';
 import { useProfile } from '@/features/profile/ProfileProvider';
-import { useLeaderboard } from '@/features/progress/hooks';
+import { levelForXp } from '@/game/engine';
+import { useGame } from '@/game/store';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useT } from '@/i18n';
 import { cn } from '@/lib/cn';
-import { errorMessage } from '@/lib/errors';
+
+/** Illustrative players — the demo has no server, so only "you" is real. */
+const SAMPLE = [
+  { name: 'Aziza', avatar: 'aurora', xp: 1240 },
+  { name: 'Timur', avatar: 'ember', xp: 980 },
+  { name: 'Mila', avatar: 'pulse', xp: 760 },
+  { name: 'Jasur', avatar: 'circuit', xp: 610 },
+  { name: 'Alex', avatar: 'glacier', xp: 455 },
+  { name: 'Nodira', avatar: 'quasar', xp: 330 },
+  { name: 'Sardor', avatar: 'terminal', xp: 210 },
+  { name: 'Lena', avatar: 'nebula', xp: 120 },
+  { name: 'Bek', avatar: 'aurora', xp: 60 },
+];
+
+const PODIUM = ['text-amber-300', 'text-slate-200', 'text-orange-300'];
 
 export default function LeaderboardPage() {
-  useDocumentTitle('Leaderboard');
-  const { profile, updateProfile } = useProfile();
-  const board = useLeaderboard();
+  const t = useT();
+  const { profile } = useProfile();
+  const xp = useGame((s) => s.game.xp);
+  useDocumentTitle(t('lb.title'));
+
+  const rows = [
+    ...SAMPLE.map((r) => ({ ...r, you: false })),
+    ...(profile.showOnLeaderboard ? [{ name: profile.displayName, avatar: profile.avatar, xp, you: true }] : []),
+  ].sort((a, b) => b.xp - a.xp || Number(b.you) - Number(a.you));
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <PageHeader eyebrow="Community" title="Leaderboard" description="Top explorers by XP. Participation is opt-in and shows only a display name, avatar, level and XP." />
-      <InlineAlert tone="warning" className="mb-6" title="Demo data">
-        Rows labelled “Sample” are illustrative placeholders; only your own profile is real.
-      </InlineAlert>
-      <Panel className="mb-6 p-5">
-          <Switch
-            checked={profile.showOnLeaderboard}
-            onChange={async (v) => {
-              try {
-                await updateProfile({ showOnLeaderboard: v });
-                await board.refetch();
-              } catch (e) {
-                toast.error('Couldn’t update visibility', errorMessage(e));
-              }
-            }}
-            label="Show me on the leaderboard"
-            description="Only your display name, avatar, level and XP are shown."
-          />
-      </Panel>
-      {board.isLoading ? (
-        <PageLoader label="Loading leaderboard…" />
-      ) : board.error ? (
-        <ErrorState error={board.error} onRetry={() => void board.refetch()} />
-      ) : !board.data?.length ? (
-        <EmptyState icon={<Crown className="h-8 w-8" />} title="No one on the board yet" description="Be the first: opt in above and earn some XP." />
-      ) : (
-        <Panel className="overflow-hidden">
-          <table className="w-full text-left text-sm">
-            <caption className="sr-only">Leaderboard ranked by total XP</caption>
-            <thead className="border-b border-white/[0.06] text-xs text-slate-500">
-              <tr>
-                <th scope="col" className="px-5 py-3 font-medium">Rank</th>
-                <th scope="col" className="px-5 py-3 font-medium">Explorer</th>
-                <th scope="col" className="px-5 py-3 text-right font-medium">Level</th>
-                <th scope="col" className="px-5 py-3 text-right font-medium">XP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {board.data.map((row) => (
-                <tr key={`${row.rank}-${row.displayName}`} className={cn('border-b border-white/[0.04] last:border-0', row.isMe && 'bg-cyan-300/[0.06]')}>
-                  <td className="px-5 py-3">
-                    <span className={cn('font-mono font-semibold', row.rank === 1 ? 'text-amber-300' : row.rank <= 3 ? 'text-slate-200' : 'text-slate-500')}>#{row.rank}</span>
-                  </td>
-                  <td className="px-5 py-3">
-                    <span className="flex items-center gap-3">
-                      <Avatar preset={row.avatar} size={30} />
-                      <span className="font-medium text-white">{row.displayName}</span>
-                      {row.isMe && <span className="rounded-full bg-cyan-300/15 px-2 py-0.5 text-[11px] text-cyan-200">You</span>}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-right text-slate-300">{row.level}</td>
-                  <td className="px-5 py-3 text-right font-semibold text-cyan-200">{row.xp.toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Panel>
-      )}
-      <p className="mt-4 flex items-center gap-1.5 text-xs text-slate-500">
-        <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> XP is only awarded for passed checks and completed activities — never twice for the same one.
-      </p>
+    <div className="mx-auto max-w-2xl">
+      <h1 className="flex items-center gap-3 text-3xl">
+        <Crown className="h-8 w-8 text-amber-300" aria-hidden /> {t('lb.title')}
+      </h1>
+      <p className="mt-2 text-sm text-slate-500">{t('lb.sample')}</p>
+      {!profile.showOnLeaderboard && <p className="mt-2 text-sm text-amber-200/80">{t('lb.hidden')}</p>}
+      <ol className="mt-6 space-y-2">
+        {rows.map((r, i) => (
+          <li
+            key={`${r.name}-${i}`}
+            className={cn(
+              'flex items-center gap-4 rounded-2xl border px-4 py-3',
+              r.you ? 'border-cyan-300/40 bg-cyan-300/[0.08]' : 'border-white/[0.06] bg-night-800/50',
+            )}
+            aria-current={r.you ? 'true' : undefined}
+          >
+            <span className="w-8 text-center text-lg font-black tabular-nums text-slate-400">
+              {i < 3 ? <Medal className={cn('mx-auto h-6 w-6', PODIUM[i])} aria-label={String(i + 1)} /> : i + 1}
+            </span>
+            <Avatar preset={r.avatar} size={40} />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate font-semibold text-white">
+                {r.name} {r.you && <span className="ml-1 rounded-full bg-cyan-300 px-2 py-0.5 text-[11px] font-bold text-night-950">{t('lb.you')}</span>}
+              </span>
+              <span className="text-xs text-slate-500">{t('common.levelN', { n: levelForXp(r.xp) })}</span>
+            </span>
+            <span className="text-lg font-bold tabular-nums text-cyan-200">{r.xp}</span>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

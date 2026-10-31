@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import Editor, { type OnMount } from '@monaco-editor/react';
 import { Spinner } from '@/components/ui/Feedback';
 import { useSettings } from '@/features/settings/settingsStore';
+import { tNow } from '@/i18n';
 import './monaco';
 
 export type EditorLanguage = 'html' | 'css' | 'javascript' | 'python' | 'json';
@@ -34,13 +35,13 @@ export function CodeEditor({ value, onChange, language, path, ariaLabel, onRun, 
     editorRef.current = editor;
     editor.addAction({
       id: 'codeworld.run',
-      label: 'Run code',
+      label: tNow('editor.sc.run'),
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
       run: () => runRef.current?.(),
     });
     editor.addAction({
       id: 'codeworld.check',
-      label: 'Check solution',
+      label: tNow('editor.sc.check'),
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter],
       run: () => checkRef.current?.(),
     });
@@ -54,7 +55,7 @@ export function CodeEditor({ value, onChange, language, path, ariaLabel, onRun, 
       value={value}
       onChange={(v) => onChange(v ?? '')}
       onMount={onMount}
-      loading={<Spinner label="Loading editor" />}
+      loading={<Spinner label={tNow('editor.loading')} />}
       options={{
         readOnly,
         ariaLabel,

@@ -1,29 +1,31 @@
 import { Link } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
-import { useProgress } from '@/features/progress/hooks';
-import { levelProgress } from '@/features/progress/engine';
+import { Flame } from 'lucide-react';
+import { levelProgress, streak } from '@/game/engine';
+import { useGame } from '@/game/store';
+import { useT } from '@/i18n';
 
+/** Level, XP bar and day streak in the navbar. */
 export function XpChip() {
-  const { snapshot } = useProgress();
-  if (!snapshot) return null;
-  const lp = levelProgress(snapshot.xp);
+  const t = useT();
+  const game = useGame((s) => s.game);
+  const lp = levelProgress(game.xp);
+  const days = streak(game);
   return (
     <Link
-      to="/progress"
-      className="focus-ring group hidden items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] py-1 pl-1.5 pr-3 hover:border-cyan-300/30 sm:flex"
-      aria-label={`Level ${lp.level}, ${snapshot.xp} XP. ${lp.toNext} XP to next level. Open progress center.`}
+      to="/profile"
+      className="focus-ring group flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] py-1 pl-1 pr-3 hover:border-cyan-300/30"
+      aria-label={`${t('common.levelN', { n: lp.level })} · ${game.xp} XP · ${t('common.xpToNext', { n: lp.toNext })} · ${t('profile.streak')}: ${days}`}
     >
-      <span className="grid h-6 min-w-6 place-items-center rounded-full bg-gradient-to-br from-cyan-300 to-violet-400 px-1.5 text-[11px] font-bold text-night-950">
-        {lp.level}
-      </span>
-      <span className="flex flex-col">
-        <span className="flex items-center gap-1 text-[12px] font-semibold leading-none text-white">
-          <Sparkles className="h-3 w-3 text-cyan-300" aria-hidden />
-          {snapshot.xp.toLocaleString()} XP
-        </span>
-        <span className="mt-1 h-1 w-16 overflow-hidden rounded-full bg-white/10">
+      <span className="grid h-7 min-w-7 place-items-center rounded-full bg-gradient-to-br from-cyan-300 to-violet-400 px-1.5 text-[12px] font-black text-night-950">{lp.level}</span>
+      <span className="hidden flex-col sm:flex">
+        <span className="text-[12px] font-bold leading-none text-white">{game.xp} XP</span>
+        <span className="mt-1 h-1 w-14 overflow-hidden rounded-full bg-white/10">
           <span className="block h-full rounded-full bg-cyan-300" style={{ width: `${lp.ratio * 100}%` }} />
         </span>
+      </span>
+      <span className="flex items-center gap-0.5 text-[13px] font-bold text-amber-300">
+        <Flame className="h-4 w-4" aria-hidden />
+        {days}
       </span>
     </Link>
   );

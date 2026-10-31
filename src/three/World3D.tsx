@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import * as THREE from 'three';
-import type { BuildingId } from '@/types';
+import type { BuildingId } from '@/data/buildings';
 import type { BuildingStatus } from './buildings/Building';
 import { CityCanvas } from './CityCanvas';
 import { CityScene } from './CityScene';

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { CircleAlert, CircleX, Info, Terminal, TriangleAlert, Trash2 } from 'lucide-react';
+import { useT } from '@/i18n';
 import { cn } from '@/lib/cn';
 import type { ConsoleEntry } from './sandbox/types';
 
@@ -12,6 +13,7 @@ const STYLES = {
 } as const;
 
 export function ConsolePanel({ entries, onClear, emptyHint }: { entries: ConsoleEntry[]; onClear: () => void; emptyHint: string }) {
+  const t = useT();
   const end = useRef<HTMLDivElement>(null);
   useEffect(() => {
     end.current?.scrollIntoView({ block: 'nearest' });
@@ -19,12 +21,12 @@ export function ConsolePanel({ entries, onClear, emptyHint }: { entries: Console
   return (
     <div className="flex h-full flex-col bg-[#060a14]">
       <div className="flex items-center justify-between border-b border-white/[0.06] px-3 py-1.5">
-        <span className="text-[11px] text-slate-500">{entries.length ? `${entries.length} message${entries.length === 1 ? '' : 's'}` : 'Console'}</span>
-        <button type="button" onClick={onClear} className="focus-ring inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] text-slate-400 hover:bg-white/10 hover:text-white" aria-label="Clear console">
-          <Trash2 className="h-3 w-3" aria-hidden /> Clear
+        <span className="text-[11px] text-slate-500">{entries.length ? t('console.messages', { n: entries.length }) : t('editor.console')}</span>
+        <button type="button" onClick={onClear} className="focus-ring inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] text-slate-400 hover:bg-white/10 hover:text-white" aria-label={t('editor.clear')}>
+          <Trash2 className="h-3 w-3" aria-hidden /> {t('editor.clear')}
         </button>
       </div>
-      <div role="log" aria-live="polite" aria-label="Program output" className="min-h-0 flex-1 overflow-auto py-1 font-mono text-[12.5px] leading-5">
+      <div role="log" aria-live="polite" aria-label={t('editor.output')} className="min-h-0 flex-1 overflow-auto py-1 font-mono text-[12.5px] leading-5">
         {entries.length === 0 ? (
           <p className="px-4 py-3 text-slate-500">{emptyHint}</p>
         ) : (

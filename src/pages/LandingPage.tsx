@@ -1,14 +1,11 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, BookOpen, Code2, Compass, Flag, Lock, Map as MapIcon, ShieldCheck, Sparkles, Trophy } from 'lucide-react';
+import { Building2, Gamepad2, Play, Swords, Trophy } from 'lucide-react';
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
 import { ButtonLink } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { NamedIcon } from '@/components/ui/Icon';
-import { useCatalog } from '@/features/content/hooks';
-import { buildingById } from '@/data/buildings';
+import { ZONES } from '@/game/content';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useT } from '@/i18n';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { cn } from '@/lib/cn';
 import { useQuality } from '@/three/quality';
@@ -78,23 +75,13 @@ function HeroBackground() {
   );
 }
 
-const STEPS = [
-  { icon: Compass, title: 'Explore the city', body: 'Walk or fly between towers. Every building is a learning area — HTML, CSS, JavaScript, Python and React.' },
-  { icon: BookOpen, title: 'Learn by doing', body: 'Short lessons with runnable examples, knowledge checks and exercises verified automatically.' },
-  { icon: Code2, title: 'Build in a real editor', body: 'A professional workspace with Monaco, live preview, console output and sandboxed execution.' },
-  { icon: Trophy, title: 'Level up', body: 'Earn XP for real completions, unlock new districts, claim missions and collect achievements.' },
-];
-
 export default function LandingPage() {
-  useDocumentTitle('Enter the World of Code');
-  const { data: catalog } = useCatalog();
-  const startHref = '/dashboard';
-
-  const stats = [
-    { label: 'Courses', value: catalog?.courses.length ?? '—' },
-    { label: 'Lessons', value: catalog?.lessons.length ?? '—' },
-    { label: 'Coding exercises', value: catalog?.exercises.length ?? '—' },
-    { label: 'Missions & badges', value: catalog ? catalog.missions.length + catalog.achievements.length : '—' },
+  const t = useT();
+  useDocumentTitle(`${t('landing.title1')} ${t('landing.title2')}`);
+  const features = [
+    { icon: Gamepad2, title: t('landing.f1'), body: t('landing.f1d'), color: 'text-cyan-300' },
+    { icon: Swords, title: t('landing.f2'), body: t('landing.f2d'), color: 'text-rose-300' },
+    { icon: Trophy, title: t('landing.f3'), body: t('landing.f3d'), color: 'text-amber-300' },
   ];
 
   return (
@@ -103,173 +90,50 @@ export default function LandingPage() {
         <Navbar transparent />
       </div>
 
-      {/* Hero */}
       <section className="relative isolate flex min-h-[100svh] items-center overflow-hidden" aria-labelledby="hero-title">
         <HeroBackground />
-        <div id="main" className="relative mx-auto w-full max-w-7xl px-4 pb-24 pt-32 sm:px-6">
-          <div className="max-w-3xl">
-            <Badge tone="cyan" className="mb-6 animate-fade-in backdrop-blur">
-              <Sparkles className="h-3 w-3" aria-hidden /> Interactive 3D learning platform
-            </Badge>
-            <h1 id="hero-title" className="animate-rise-in text-[2.6rem] font-bold leading-[1.02] tracking-[-0.03em] sm:text-6xl lg:text-7xl">
-              ENTER THE
+        <div id="main" className="relative mx-auto w-full max-w-6xl px-4 pb-20 pt-28 sm:px-6">
+          <div className="max-w-2xl">
+            <h1 id="hero-title" className="animate-rise-in text-[2.6rem] font-black leading-[1.02] tracking-[-0.03em] sm:text-6xl lg:text-7xl">
+              {t('landing.title1')}
               <br />
-              <span className="text-gradient">WORLD OF CODE</span>
+              <span className="text-gradient">{t('landing.title2')}</span>
             </h1>
-            <p className="mt-6 max-w-xl animate-rise-in text-base leading-relaxed text-slate-300 [animation-delay:120ms] sm:text-lg">
-              Learn programming by exploring a living technology city. Step into each tower to master HTML, CSS, JavaScript, Python and React —
-              writing real code, solving missions and unlocking new districts as you grow.
-            </p>
+            <p className="mt-6 max-w-lg animate-rise-in text-lg leading-relaxed text-slate-300 [animation-delay:120ms]">{t('landing.subtitle')}</p>
             <div className="mt-9 flex animate-rise-in flex-wrap gap-3 [animation-delay:200ms]">
-              <ButtonLink to={startHref} size="lg" icon={<ArrowRight className="h-4 w-4" />}>
-                Start Learning
+              <ButtonLink to="/map" size="lg" className="px-8 text-lg" icon={<Play className="h-5 w-5 fill-current" />}>
+                {t('landing.play')}
               </ButtonLink>
-              <ButtonLink to="/world" size="lg" variant="secondary" className="backdrop-blur" icon={<MapIcon className="h-4 w-4" />}>
-                Explore the World
+              <ButtonLink to="/world" size="lg" variant="secondary" className="backdrop-blur" icon={<Building2 className="h-5 w-5" />}>
+                {t('landing.explore')}
               </ButtonLink>
             </div>
+            <ul className="mt-12 flex animate-fade-in flex-wrap gap-2 [animation-delay:300ms]" aria-label={t('map.title')}>
+              {ZONES.map((z) => (
+                <li
+                  key={z.id}
+                  className="rounded-xl border px-3 py-1.5 font-mono text-sm font-bold backdrop-blur"
+                  style={{ borderColor: `${z.accent}55`, color: z.accent, background: `${z.accent}14` }}
+                  title={t(z.nameKey)}
+                >
+                  {z.symbol}
+                </li>
+              ))}
+            </ul>
           </div>
-          <dl className="mt-16 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.06] backdrop-blur-md sm:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="bg-night-950/60 px-5 py-4">
-                <dt className="text-xs text-slate-400">{s.label}</dt>
-                <dd className="mt-1 text-2xl font-semibold text-white">{s.value}</dd>
-              </div>
-            ))}
-          </dl>
         </div>
       </section>
 
-      <main className="relative mx-auto max-w-7xl space-y-28 px-4 sm:px-6">
-        {/* Course districts */}
-        <section aria-labelledby="courses-title">
-          <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-            <div>
-              <p className="eyebrow mb-2">Districts</p>
-              <h2 id="courses-title" className="text-3xl md:text-4xl">
-                Five towers. One skill tree.
-              </h2>
-              <p className="mt-3 max-w-xl text-slate-400">Each course lives in its own building, from beginner fundamentals to advanced techniques.</p>
-            </div>
-            <ButtonLink to="/courses" variant="ghost" icon={<ArrowRight className="h-4 w-4" />}>
-              All courses
-            </ButtonLink>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {(catalog?.courses ?? []).map((course) => {
-              const building = buildingById(course.buildingId);
-              const lessons = catalog?.lessons.filter((l) => l.courseId === course.id).length ?? 0;
-              return (
-                <Link
-                  key={course.id}
-                  to={`/courses/${course.id}`}
-                  className="focus-ring glass group relative flex flex-col overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:border-white/20"
-                >
-                  <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-30 blur-2xl transition-opacity group-hover:opacity-60" style={{ background: course.accent }} />
-                  <span className="grid h-11 w-11 place-items-center rounded-xl border font-mono text-sm font-semibold" style={{ borderColor: `${course.accent}55`, color: course.accent, background: `${course.accent}12` }}>
-                    {building?.symbol ?? '</>'}
-                  </span>
-                  <h3 className="mt-5 text-base">{course.title}</h3>
-                  <p className="mt-1.5 flex-1 text-[13px] leading-relaxed text-slate-400">{course.tagline}</p>
-                  <div className="mt-5 flex items-center justify-between text-[12px] text-slate-500">
-                    <span>{lessons} lessons</span>
-                    {course.requiredLevel > 1 ? (
-                      <span className="inline-flex items-center gap-1">
-                        <Lock className="h-3 w-3" aria-hidden /> Lv {course.requiredLevel}
-                      </span>
-                    ) : (
-                      <span className="text-emerald-300/80">Open</span>
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* How it works */}
-        <section aria-labelledby="how-title">
-          <p className="eyebrow mb-2">How it works</p>
-          <h2 id="how-title" className="text-3xl md:text-4xl">
-            A game world with a serious workshop inside
-          </h2>
-          <ol className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {STEPS.map(({ icon: Icon, title, body }, i) => (
-              <li key={title} className="glass rounded-2xl p-6">
-                <div className="flex items-center justify-between">
-                  <Icon className="h-6 w-6 text-cyan-300" aria-hidden />
-                  <span className="font-mono text-xs text-slate-600">0{i + 1}</span>
-                </div>
-                <h3 className="mt-5 text-base">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-400">{body}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        {/* Missions & achievements */}
-        <section aria-labelledby="missions-title" className="grid gap-8 lg:grid-cols-2">
-          <div>
-            <p className="eyebrow mb-2">Missions</p>
-            <h2 id="missions-title" className="text-3xl md:text-4xl">
-              Objectives that reward real progress
-            </h2>
-            <p className="mt-3 max-w-lg text-slate-400">
-              XP is only granted for verified completions — passing checks, finishing lessons and meeting mission goals. No repeat farming.
-            </p>
-            <ul className="mt-8 space-y-3">
-              {(catalog?.missions ?? []).slice(0, 4).map((m) => (
-                <li key={m.id} className="glass flex items-center gap-4 rounded-xl p-4">
-                  <Flag className="h-5 w-5 shrink-0 text-pink-300" aria-hidden />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-white">{m.title}</p>
-                    <p className="truncate text-[13px] text-slate-400">{m.description}</p>
-                  </div>
-                  <Badge tone="cyan">+{m.xp} XP</Badge>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <p className="eyebrow mb-2">Achievement Hall</p>
-            <h2 className="text-3xl md:text-4xl">Badges worth displaying</h2>
-            <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {(catalog?.achievements ?? []).slice(0, 9).map((a) => (
-                <li key={a.id} className="glass flex flex-col items-center rounded-xl p-4 text-center">
-                  <span
-                    className={cn(
-                      'grid h-11 w-11 place-items-center rounded-full border',
-                      a.tier === 'gold' && 'border-amber-300/40 bg-amber-300/10 text-amber-300',
-                      a.tier === 'silver' && 'border-slate-300/40 bg-slate-300/10 text-slate-200',
-                      a.tier === 'bronze' && 'border-orange-400/40 bg-orange-400/10 text-orange-300',
-                      a.tier === 'platinum' && 'border-cyan-200/40 bg-cyan-200/10 text-cyan-100',
-                    )}
-                  >
-                    <NamedIcon name={a.icon} className="h-5 w-5" />
-                  </span>
-                  <p className="mt-3 text-[13px] font-medium text-white">{a.title}</p>
-                  <p className="mt-0.5 text-[11px] leading-snug text-slate-500">{a.description}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="glass-strong relative overflow-hidden rounded-3xl px-6 py-14 text-center sm:px-12">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(92,225,255,0.15),transparent_60%)]" />
-          <ShieldCheck className="mx-auto h-8 w-8 text-cyan-300" aria-hidden />
-          <h2 className="relative mt-4 text-3xl md:text-4xl">Your first tower is open.</h2>
-          <p className="relative mx-auto mt-3 max-w-lg text-slate-400">HTML Academy is unlocked for every new explorer. Write your first page in under ten minutes.</p>
-          <div className="relative mt-8 flex flex-wrap justify-center gap-3">
-            <ButtonLink to="/courses/html" size="lg" icon={<ArrowRight className="h-4 w-4" />}>
-              Begin HTML Foundations
-            </ButtonLink>
-            <ButtonLink to="/playground" size="lg" variant="secondary" icon={<Code2 className="h-4 w-4" />}>
-              Open the playground
-            </ButtonLink>
-          </div>
-        </section>
+      <main className="relative mx-auto max-w-6xl px-4 sm:px-6">
+        <ul className="grid gap-4 sm:grid-cols-3">
+          {features.map(({ icon: Icon, title, body, color }) => (
+            <li key={title} className="glass rounded-3xl p-6">
+              <Icon className={`h-9 w-9 ${color}`} aria-hidden />
+              <h2 className="mt-4 text-xl">{title}</h2>
+              <p className="mt-1 text-slate-400">{body}</p>
+            </li>
+          ))}
+        </ul>
       </main>
       <Footer />
     </div>

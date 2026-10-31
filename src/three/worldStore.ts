@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { BuildingId } from '@/types';
+import type { BuildingId } from '@/data/buildings';
 
 export type CameraMode = 'overview' | 'walk';
 

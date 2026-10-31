@@ -18,7 +18,7 @@ export function LogoMark({ className }: { className?: string }) {
 
 export function Logo({ className, to = '/' }: { className?: string; to?: string }) {
   return (
-    <Link to={to} className={cn('focus-ring group flex items-center gap-2.5 rounded-lg', className)} aria-label="3D Code World home">
+    <Link to={to} className={cn('focus-ring group flex items-center gap-2.5 rounded-lg', className)} aria-label="3D Code World">
       <LogoMark className="transition-transform duration-300 group-hover:rotate-[30deg]" />
       <span className="text-[15px] font-semibold tracking-tight text-white">
         3D Code <span className="text-gradient">World</span>

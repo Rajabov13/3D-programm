@@ -1,16 +1,16 @@
-import { BookOpen, Code2, Flag, LayoutDashboard, Map as MapIcon, Trophy, type LucideIcon } from 'lucide-react';
+import { Code2, Gift, Map as MapIcon, Trophy, Building2, type LucideIcon } from 'lucide-react';
+import type { DictKey } from '@/i18n';
 
 export interface NavItem {
   to: string;
-  label: string;
+  labelKey: DictKey;
   icon: LucideIcon;
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/world', label: 'World', icon: MapIcon },
-  { to: '/courses', label: 'Courses', icon: BookOpen },
-  { to: '/missions', label: 'Missions', icon: Flag },
-  { to: '/playground', label: 'Playground', icon: Code2 },
-  { to: '/leaderboard', label: 'Leaderboard', icon: Trophy },
+  { to: '/map', labelKey: 'nav.map', icon: MapIcon },
+  { to: '/world', labelKey: 'nav.world', icon: Building2 },
+  { to: '/quests', labelKey: 'nav.quests', icon: Gift },
+  { to: '/leaderboard', labelKey: 'nav.leaderboard', icon: Trophy },
+  { to: '/lab', labelKey: 'nav.lab', icon: Code2 },
 ];

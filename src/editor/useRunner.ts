@@ -5,6 +5,7 @@ import { buildReactDocument, buildWebDocument, TransformError } from './sandbox/
 import { runJavaScript } from './sandbox/jsRunner';
 import { pyodideRunner, runPython, type PythonRuntimeState } from './sandbox/pythonRunner';
 import { newRunId, type ConsoleEntry, type RunStatus } from './sandbox/types';
+import { tNow } from '@/i18n';
 import { config } from '@/services/config';
 
 export interface RunOutcome {
@@ -75,19 +76,19 @@ export function useRunner(mode: ExerciseMode) {
             } catch (error) {
               push({
                 level: 'error',
-                text: error instanceof TransformError ? `Syntax error in App.jsx: ${error.message}` : `Could not prepare the React preview: ${String(error)}`,
+                text: error instanceof TransformError ? tNow('console.syntax', { msg: error.message }) : tNow('console.reactFail', { msg: String(error) }),
               });
               return finish({ status: 'error' });
             }
           }
           setPreview({ doc, runId });
           const handle = await new Promise<PreviewHandle | null>((resolve) => requestAnimationFrame(() => resolve(previewRef.current)));
-          if (!handle) return finish({ status: 'unavailable', message: 'Preview unavailable.' });
+          if (!handle) return finish({ status: 'unavailable', message: tNow('editor.s.unavailable') });
           const ready = await handle.whenReady(runId);
           if (!ready) {
-            push({ level: 'system', text: 'The preview took too long to load. Check for very long-running code at page load.' });
+            push({ level: 'system', text: tNow('console.previewSlow') });
             const runtime = options.runtimeChecks?.length
-              ? Object.fromEntries(options.runtimeChecks.map((c) => [c.id, { pass: false, message: 'The preview did not finish loading.' }]))
+              ? Object.fromEntries(options.runtimeChecks.map((c) => [c.id, { pass: false, message: tNow('console.previewSlow') }]))
               : undefined;
             return finish({ status: 'timeout', runtime });
           }
@@ -96,11 +97,11 @@ export function useRunner(mode: ExerciseMode) {
         }
         if (mode === 'console') {
           const result = await runJavaScript(files.js ?? '', { onConsole: push });
-          if (result.status === 'unavailable') push({ level: 'error', text: result.message ?? 'The JavaScript sandbox is unavailable.' });
+          if (result.status === 'unavailable') push({ level: 'error', text: tNow('console.unavailable', { msg: result.message ?? 'JavaScript' }) });
           return finish({ status: result.status, stdout: result.stdout, message: result.message });
         }
         const result = await runPython(files.py ?? '', { stdin: options.stdin, onConsole: push });
-        if (result.status === 'unavailable') push({ level: 'error', text: result.message ?? 'The Python runtime is unavailable.' });
+        if (result.status === 'unavailable') push({ level: 'error', text: tNow('console.unavailable', { msg: result.message ?? 'Python' }) });
         return finish({ status: result.status, stdout: result.stdout, message: result.message });
       } finally {
         setRunning(false);

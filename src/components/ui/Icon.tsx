@@ -1,12 +1,12 @@
 import {
   Activity, Atom, Award, Braces, CircleCheck, Compass, Cpu, FileCode2, Flag, Flame, Gem, Orbit, Palette, Rocket,
-  Snowflake, Sparkles, Star, Target, Terminal, Trophy, TrendingUp, Wind, Zap, Medal, Crown, type LucideIcon,
+  Snowflake, Sparkles, Star, Swords, Target, Terminal, Trophy, TrendingUp, Wind, Zap, Medal, Crown, type LucideIcon,
 } from 'lucide-react';
 
 /** Icons that content (achievements, avatars) may reference by name. */
 export const ICONS: Record<string, LucideIcon> = {
   Activity, Atom, Award, Braces, CircleCheck, Compass, Cpu, FileCode2, Flag, Flame, Gem, Orbit, Palette, Rocket,
-  Snowflake, Sparkles, Star, Target, Terminal, Trophy, TrendingUp, Wind, Zap, Medal, Crown,
+  Snowflake, Sparkles, Star, Swords, Target, Terminal, Trophy, TrendingUp, Wind, Zap, Medal, Crown,
 };
 
 export const ICON_NAMES = Object.keys(ICONS).sort();

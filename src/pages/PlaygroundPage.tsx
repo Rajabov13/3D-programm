@@ -1,56 +1,48 @@
-import { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import type { ExerciseMode } from '@shared/checks';
 import { Workspace } from '@/editor/Workspace';
 import { EXAMPLES } from '@/editor/examples';
 import { filesForMode, MODE_LABELS } from '@/editor/files';
-import type { PlaygroundLaunchState } from '@/editor/playgroundTypes';
 import { useRunner } from '@/editor/useRunner';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useDraft } from '@/hooks/useDraft';
+import { useL, useT } from '@/i18n';
 import { readJSON, writeJSON } from '@/lib/storage';
 
 const MODES: ExerciseMode[] = ['web', 'console', 'python', 'react'];
 
+/** Free-form code lab: write anything, run it in the sandbox. */
 export default function PlaygroundPage() {
-  useDocumentTitle('Playground');
-  const location = useLocation();
-  const navigate = useNavigate();
-  const launch = location.state as PlaygroundLaunchState | null;
-  const [mode, setMode] = useState<ExerciseMode>(() => launch?.mode ?? readJSON<ExerciseMode>('cw.playground.mode', 'web'));
+  const t = useT();
+  const l = useL();
+  useDocumentTitle(t('lab.title'));
+  const [mode, setMode] = useState<ExerciseMode>(() => {
+    const saved = readJSON<ExerciseMode>('cw.playground.mode', 'web');
+    return MODES.includes(saved) ? saved : 'web';
+  });
   const draft = useDraft(`playground.${mode}`, filesForMode(mode, EXAMPLES[mode][0].files));
   const runner = useRunner(mode);
   const [stdin, setStdin] = useState('');
   const [autoRun, setAutoRun] = useState(true);
-  const launched = useRef(false);
 
   useEffect(() => {
     writeJSON('cw.playground.mode', mode);
   }, [mode]);
-
-  // "Try it" from a lesson: load the snippet once, then clear router state.
-  useEffect(() => {
-    if (launch && !launched.current && launch.mode === mode) {
-      launched.current = true;
-      draft.replace(filesForMode(mode, launch.files));
-      navigate('.', { replace: true, state: null });
-    }
-  }, [launch, mode, draft, navigate]);
 
   // Live preview for web/React: re-run shortly after typing stops.
   const live = autoRun && (mode === 'web' || mode === 'react');
   const files = draft.files;
   useEffect(() => {
     if (!live) return;
-    const t = window.setTimeout(() => void runner.run(files), 700);
-    return () => window.clearTimeout(t);
+    const timer = window.setTimeout(() => void runner.run(files), 700);
+    return () => window.clearTimeout(timer);
   }, [files, live]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toolbarStart = (
     <div className="flex flex-wrap items-center gap-2">
-      <h1 className="sr-only">Code playground</h1>
+      <h1 className="sr-only">{t('lab.title')}</h1>
       <label htmlFor="pg-language" className="sr-only">
-        Language
+        {t('lab.language')}
       </label>
       <select
         id="pg-language"
@@ -65,7 +57,7 @@ export default function PlaygroundPage() {
         ))}
       </select>
       <label htmlFor="pg-example" className="sr-only">
-        Load example
+        {t('lab.example')}
       </label>
       <select
         id="pg-example"
@@ -77,18 +69,18 @@ export default function PlaygroundPage() {
         className="focus-ring h-8 max-w-[11rem] rounded-lg border border-white/10 bg-night-950 px-2.5 text-[13px] text-slate-300"
       >
         <option value="" disabled>
-          Load example…
+          {t('lab.example')}
         </option>
         {EXAMPLES[mode].map((x) => (
           <option key={x.id} value={x.id}>
-            {x.title}
+            {l(x.title)}
           </option>
         ))}
       </select>
       {(mode === 'web' || mode === 'react') && (
         <label className="flex items-center gap-1.5 text-[12px] text-slate-400">
           <input type="checkbox" checked={autoRun} onChange={(e) => setAutoRun(e.target.checked)} className="accent-cyan-400" />
-          Live preview
+          {t('lab.live')}
         </label>
       )}
     </div>

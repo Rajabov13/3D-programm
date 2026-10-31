@@ -1,7 +1,7 @@
 import { Lock } from 'lucide-react';
 import { buildings, PLAZA_RADIUS } from '@/data/buildings';
 import { cn } from '@/lib/cn';
-import type { BuildingId } from '@/types';
+import type { BuildingId } from '@/data/buildings';
 import type { BuildingInfo } from './useBuildingStatuses';
 
 const EXTENT = 46;
@@ -70,12 +70,12 @@ export function WorldMap2D({
             )}
             style={{ left: `${pct(b.position[0])}%`, top: `${pct(b.position[1])}%` }}
             aria-pressed={selectedId === b.id}
-            aria-label={`${b.name}. ${info.summary}`}
+            aria-label={`${info.name}. ${info.summary}`}
           >
             <span className="grid h-9 w-9 place-items-center rounded-lg border bg-night-900/90 font-mono text-[11px] font-semibold" style={{ borderColor: b.accent, color: b.accent }}>
               {info.status.locked ? <Lock className="h-4 w-4 text-amber-300" aria-hidden /> : b.symbol}
             </span>
-            <span className="max-w-[110px] text-[11px] font-medium leading-tight text-slate-200 drop-shadow">{b.name}</span>
+            <span className="max-w-[110px] text-[11px] font-medium leading-tight text-slate-200 drop-shadow">{info.name}</span>
           </button>
         );
       })}

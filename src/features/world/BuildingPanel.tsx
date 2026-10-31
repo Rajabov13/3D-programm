@@ -1,30 +1,33 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Lock, Navigation, X } from 'lucide-react';
-import { Badge } from '@/components/ui/Badge';
+import { ArrowRight, Lock, Navigation, Play, Swords, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/Progress';
-import type { Catalog } from '@/types';
+import { isBossUnlocked } from '@/game/engine';
+import { useGame } from '@/game/store';
+import { useT } from '@/i18n';
 import type { BuildingInfo } from './useBuildingStatuses';
 
 export function BuildingPanel({
   info,
   level,
-  catalog,
   onClose,
   onTravel,
   travelLabel,
 }: {
   info: BuildingInfo;
   level: number;
-  catalog?: Catalog;
   onClose: () => void;
   onTravel?: () => void;
   travelLabel?: string;
 }) {
+  const t = useT();
   const navigate = useNavigate();
-  const { def, course, status } = info;
-  const prereqNames = course?.prerequisites.map((id) => catalog?.courses.find((c) => c.id === id)?.title ?? id) ?? [];
-  const enterLabel = status.locked ? 'Preview course' : def.kind === 'course' ? `Enter ${def.name}` : `Open ${def.name}`;
+  const game = useGame((s) => s.game);
+  const { def, zone, status, name } = info;
+
+  // The quickest way into the game from a tower: the next stage (or the boss).
+  const nextStage = zone?.stages.find((s) => !(game.stars[s.id] > 0));
+  const bossReady = zone && !nextStage && isBossUnlocked(game, zone) && !game.bosses[zone.id];
 
   return (
     <section
@@ -35,57 +38,62 @@ export function BuildingPanel({
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <span
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border font-mono text-sm font-semibold"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border font-mono text-sm font-bold"
             style={{ borderColor: `${def.accent}55`, background: `${def.accent}14`, color: def.accent }}
             aria-hidden
           >
             {def.symbol}
           </span>
           <div>
-            <h2 id="building-panel-title" className="text-base leading-tight">
-              {def.name}
+            <h2 id="building-panel-title" className="text-lg leading-tight">
+              {name}
             </h2>
-            <p className="mt-0.5 text-xs text-slate-400">{info.summary}</p>
+            <p className="mt-0.5 text-xs text-slate-400">{t(def.descKey)}</p>
           </div>
         </div>
-        <button type="button" onClick={onClose} className="focus-ring rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white" aria-label="Close panel">
+        <button type="button" onClick={onClose} className="focus-ring rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white" aria-label={t('common.close')}>
           <X className="h-4 w-4" />
         </button>
       </div>
 
-      <p className="mt-4 text-sm leading-relaxed text-slate-300">{course?.description ?? def.description}</p>
-
-      {course && (
-        <div className="mt-4 space-y-3">
-          <div>
-            <div className="mb-1.5 flex justify-between text-xs text-slate-400">
-              <span>Course progress</span>
-              <span>
-                {info.completed}/{info.total} lessons
+      {zone && !status.locked && (
+        <div className="mt-4">
+          <div className="mb-1.5 flex justify-between text-sm">
+            <span className="font-semibold text-amber-200">
+              ⭐ {info.stars}/{info.maxStars}
+            </span>
+            {info.bossDefeated && (
+              <span className="flex items-center gap-1 text-xs font-semibold text-emerald-300">
+                <Swords className="h-3.5 w-3.5" aria-hidden /> {t('zone.defeated')}
               </span>
-            </div>
-            <ProgressBar value={info.completed ?? 0} max={Math.max(1, info.total ?? 1)} label={`${course.title} progress`} />
+            )}
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            <Badge tone={status.locked ? 'amber' : 'green'}>
-              {status.locked ? <Lock className="h-3 w-3" aria-hidden /> : null}
-              {status.locked ? `Requires level ${course.requiredLevel} (you are ${level})` : 'Unlocked'}
-            </Badge>
-            <Badge>~{course.estimatedHours} h</Badge>
-            {prereqNames.length > 0 && <Badge tone="violet">Recommended first: {prereqNames.join(', ')}</Badge>}
-          </div>
+          <ProgressBar value={info.stars ?? 0} max={info.maxStars ?? 1} tone="amber" label={`${name} ⭐`} />
         </div>
       )}
-
-      {info.unavailable && <p className="mt-3 text-xs text-amber-200">This course hasn’t been published yet. An administrator can publish it from the admin area.</p>}
+      {status.locked && (
+        <p className="mt-4 flex items-center gap-2 rounded-xl bg-amber-300/[0.08] px-3 py-2 text-sm text-amber-100">
+          <Lock className="h-4 w-4 text-amber-300" aria-hidden />
+          {t('common.unlocksAt', { n: status.requiredLevel ?? 1 })} · {t('common.levelN', { n: level })}
+        </p>
+      )}
+      {!zone && <p className="mt-4 text-sm text-slate-300">{info.summary}</p>}
 
       <div className="mt-5 flex flex-wrap gap-2">
-        <Button onClick={() => navigate(def.route)} disabled={info.unavailable} icon={<ArrowRight className="h-4 w-4" />}>
-          {enterLabel}
+        {zone && !status.locked && (nextStage || bossReady) ? (
+          <Button
+            onClick={() => navigate(nextStage ? `/play/${nextStage.id}` : `/boss/${zone.id}`)}
+            icon={nextStage ? <Play className="h-4 w-4 fill-current" /> : <Swords className="h-4 w-4" />}
+          >
+            {nextStage ? t('zone.play') : t('zone.boss')}
+          </Button>
+        ) : null}
+        <Button variant={zone && !status.locked ? 'secondary' : 'primary'} onClick={() => navigate(def.route)} icon={<ArrowRight className="h-4 w-4" />}>
+          {t('world.open')}
         </Button>
         {onTravel && (
-          <Button variant="secondary" onClick={onTravel} icon={<Navigation className="h-4 w-4" />}>
-            {travelLabel ?? 'Travel here'}
+          <Button variant="ghost" onClick={onTravel} icon={<Navigation className="h-4 w-4" />}>
+            {travelLabel ?? t('world.fly')}
           </Button>
         )}
       </div>

@@ -1,32 +1,32 @@
 # 3D Code World — demo version
 
-**Learn to code by exploring a living 3D technology city.** Each tower is a learning
-area — HTML Academy, CSS Design Studio, JavaScript Laboratory, Python Center and
-React Development Tower — plus a Mission Center, Achievement Hall and Personal
-Progress Center. Learners read short lessons, pass knowledge checks, solve coding
-exercises in a professional editor, earn XP and unlock new districts.
+**Learn to code by playing.** A neon 3D city with five worlds — HTML, CSS, Python,
+JavaScript and React. Each world has 5 short stages of quick mini-games and ends with a
+**boss fight** where you write real code. Collect stars, keep your streak, finish daily
+quests, earn badges and level up to unlock the next world.
 
-> **This is the demo version.** It has no backend, database or accounts: the learner
-> profile, progress, XP and admin edits are stored in the browser (`localStorage`).
-> A banner in the app says so.
+The interface is available in **Oʻzbekcha (default), Русский and English** — switch
+any time with the UZ · RU · EN switcher (also on the 3D signs in the city).
 
-## Features
+> **This is the demo version.** There is no backend, database or account system: the
+> player profile and game progress are stored in the browser (`localStorage`).
 
-- **Interactive 3D city** (React Three Fiber): orbit/fly-to overview, first-person *Explore*
-  mode with WASD + pointer lock, collisions, proximity prompts, touch joystick, keyboard
-  shortcuts, adaptive quality, and a 2D map fallback when WebGL isn’t available.
-- **Real courses**: 5 tracks × 5–6 lessons (29 lessons, 87 knowledge-check questions,
-  29 auto-checked exercises) from beginner to advanced.
-- **Coding workspace**: Monaco editor, live preview, console, resizable panels, keyboard
-  shortcuts and drafts. Code runs in isolated browser sandboxes: HTML/CSS/JS and React in
-  an opaque-origin iframe, JavaScript in a Web Worker, Python via self-hosted Pyodide
-  (CPython compiled to WebAssembly).
-- **Progression**: XP and levels, missions, achievements, daily goals and streaks, course
-  unlocks and a leaderboard (with clearly labelled sample entries). XP is never awarded twice
-  for the same activity.
-- **Admin area**: course/lesson/exercise/quiz editors, publish/unpublish, solution validation
-  through the real sandboxes, achievements & missions, activity overview.
-- Responsive, keyboard accessible, reduced-motion aware.
+## How the game works
+
+| | |
+|---|---|
+| 🗺 **Map** | Five worlds. HTML is open from the start; CSS and Python open at level 2, JavaScript at 3, React at 4. |
+| 🎮 **Stages** | 5 per world, 6 tasks each, about 2 minutes. A one-line tip, then mini-games: *pick the answer*, *what does it print?*, *fill the blank*, *build the code in order*, *find the bug*, *match pairs*, *which CSS looks like this?* |
+| ❤️ **Hearts** | 3 per stage. A mistake costs a heart and the task comes back at the end. No hearts left → try again. |
+| ⭐ **Stars** | 0 mistakes = 3 stars, 1 = 2, 2 = 1. Combo counter for answers in a row. |
+| ⚔️ **Boss** | After all 5 stages: a real coding task in the Monaco editor, run in a sandbox and checked automatically (HTML page, CSS card, Python loop, JavaScript function, React counter). |
+| ✨ **XP** | +10 for clearing a stage the first time, +10 for every new best star, +50 per boss, badge and quest rewards. Replays never pay twice. Levels: 100, 250, 450, 700 … XP. |
+| 🎁 **Daily quests** | Three small goals every day (clear 2 stages, get 3 stars, earn 50 XP). |
+| 🏅 **Badges / 🏆 Ranking / 🔥 Streak** | 9 badges, a leaderboard (sample players + you) and a day streak. |
+| 🧪 **Lab** | A free code editor (HTML/CSS/JS, JavaScript, Python, React) with examples. |
+| 🏙 **3D city** | Walk or fly between the towers; each tower opens its world. 2D map fallback without WebGL. |
+
+Sound effects are synthesized with Web Audio (no audio files) and can be turned off in Settings.
 
 ## Quick start
 
@@ -54,9 +54,9 @@ from your own origin — no third-party CDN at runtime. Optional settings are li
 | `npm run build` | Type-check + production build into `dist/` |
 | `npm run preview` | Serve the production build on :4173 |
 | `npm run typecheck` / `npm run lint` | TypeScript / ESLint |
-| `npm test` | Unit + content-integrity tests (Vitest) |
-| `npm run verify:exercises` | Runs every reference solution through the real browser sandboxes (needs Playwright and a running `preview`) |
-| `npm run smoke` | End-to-end smoke test: every route on desktop + mobile, a full learning journey, admin and the 3D world (needs Playwright and a running `preview`) |
+| `npm test` | Game rules, content integrity (every task answer is executed and verified), translations, sandbox helpers (Vitest) |
+| `npm run verify:bosses` | Runs every boss solution (and starter) through the real browser sandboxes (needs Playwright and a running `preview`) |
+| `npm run smoke` | End-to-end: every route on desktop/mobile/Russian, language switching, a full game journey (stages, hearts, stars, boss, quests, level-up) and the 3D world (needs Playwright and a running `preview`) |
 
 The two browser scripts use Playwright: `npm i -D playwright && npx playwright install chromium`.
 
@@ -67,19 +67,19 @@ The two browser scripts use Playwright: `npm i -D playwright && npx playwright i
 ├── public/                  Favicon, fonts for 3D text, hosting headers (pyodide/ is generated on install)
 ├── scripts/                 Pyodide copy step, browser verification scripts
 └── src/
-    ├── components/          UI kit (buttons, panels, modal, fields…), layout, markdown, code blocks
-    ├── data/                Courses, lessons, exercises, quizzes, missions, achievements, city layout
-    ├── editor/              Monaco setup, workspace, split panes, preview, console
+    ├── game/                The game: content (5 worlds × 5 stages + bosses), rules engine, store, sounds, task components
+    ├── i18n/                uz / ru / en dictionaries, language store, switcher
+    ├── components/          UI kit (buttons, modal, fields, toasts…), layout
+    ├── data/                City layout (buildings)
+    ├── editor/              Monaco setup, workspace, preview, console, examples
     │   └── sandbox/         Preview documents, bridge, loop protection, JS worker + Python runners
-    ├── features/            profile, content, progress (rules engine + local store), world, learning, admin, settings
-    ├── hooks/               Media queries, reduced motion, drafts, shortcuts
-    ├── lib/                 Dates, errors, storage, highlighting, RNG
-    ├── pages/               Route components (incl. admin/)
-    ├── services/            Runtime configuration
-    ├── shared/              Exercise check engine (dependency-free, never executes code)
+    ├── features/            profile, world (3D/2D map panels), settings
+    ├── hooks/               Media queries, reduced motion, drafts
+    ├── lib/                 Dates, errors, storage, syntax highlighting
+    ├── pages/               Route components
+    ├── shared/              Code check engine (dependency-free, never executes code)
     ├── styles/              Tailwind entry + design tokens
-    ├── three/               City scene, buildings, materials, controls, quality, collisions
-    └── types/               Domain types
+    └── three/               City scene, buildings, materials, controls, quality, collisions
 ```
 
 More detail: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**. Manual QA: **[docs/TESTING_CHECKLIST.md](docs/TESTING_CHECKLIST.md)**.
@@ -93,11 +93,11 @@ to `index.html`. One requirement: **`/pyodide/*` must be served with
 
 ## Limitations of the demo version
 
-- Progress and admin edits live in one browser; clearing site data resets them.
-- There are no accounts, and the admin area has no access control — fine for a demo, not for
-  production.
-- Rewards are computed in the browser, so a determined user could edit their own local data.
-  A production version needs a backend that stores progress and verifies completions server-side.
+- Progress lives in one browser; clearing site data resets it.
+- There are no accounts; leaderboard rivals are sample players.
+- Rewards are computed in the browser, so a determined player could edit their own local data.
+  A production version needs a backend that stores progress and verifies boss solutions server-side
+  (the check engine in `src/shared/checks.ts` is reusable as-is).
 
 ## Licenses
 

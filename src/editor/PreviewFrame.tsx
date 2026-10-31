@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { tNow } from '@/i18n';
 import type { CheckSpec, RuntimeCheckOutcome } from '@shared/checks';
 import { isSandboxMessage, type ConsoleEntry } from './sandbox/types';
 
@@ -68,7 +69,7 @@ export const PreviewFrame = forwardRef<PreviewHandle, { doc: string | null; runI
           const timer = window.setTimeout(() => {
             resultWaiters.current.delete(id);
             resolve(
-              Object.fromEntries(checks.map((c) => [c.id, { pass: false, message: 'The preview did not respond — it may be stuck in a loop or crashed.' }])),
+              Object.fromEntries(checks.map((c) => [c.id, { pass: false, message: tNow('console.previewStuck') }])),
             );
           }, timeoutMs);
           resultWaiters.current.set(id, (results) => {
@@ -88,7 +89,7 @@ export const PreviewFrame = forwardRef<PreviewHandle, { doc: string | null; runI
         sandbox="allow-scripts"
         referrerPolicy="no-referrer"
         allow=""
-        srcDoc={doc ?? '<!DOCTYPE html><html><body style="margin:0;display:grid;place-items:center;height:100vh;font:14px system-ui;color:#64748b;background:#fff">Press Run to see your page.</body></html>'}
+        srcDoc={doc ?? `<!DOCTYPE html><html><body style="margin:0;display:grid;place-items:center;height:100vh;font:15px system-ui;color:#64748b;background:#fff">${tNow('editor.emptyPreviewDoc')}</body></html>`}
         className="h-full w-full border-0 bg-white"
       />
     );

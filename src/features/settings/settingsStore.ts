@@ -14,6 +14,7 @@ export interface DeviceSettings {
   invertLookY: boolean;
   lookSensitivity: number;
   hasSeenWorldIntro: boolean;
+  sound: boolean;
 }
 
 interface SettingsState extends DeviceSettings {
@@ -30,6 +31,7 @@ const defaults: DeviceSettings = {
   invertLookY: false,
   lookSensitivity: 1,
   hasSeenWorldIntro: false,
+  sound: true,
 };
 
 export const useSettings = create<SettingsState>()(

@@ -1,5 +1,15 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { useT } from '@/i18n';
 import { ErrorState } from './ui/Feedback';
+
+function CrashState({ error, onRetry }: { error: Error; onRetry: () => void }) {
+  const t = useT();
+  return (
+    <div className="mx-auto max-w-xl px-4 py-16">
+      <ErrorState title={t('common.crashed')} error={error} onRetry={onRetry} />
+    </div>
+  );
+}
 
 interface Props {
   children: ReactNode;
@@ -35,9 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
       return this.props.fallback ? (
         this.props.fallback(this.state.error, this.reset)
       ) : (
-        <div className="mx-auto max-w-xl px-4 py-16">
-          <ErrorState title="This part of Code World crashed" error={this.state.error} onRetry={this.reset} />
-        </div>
+        <CrashState error={this.state.error} onRetry={this.reset} />
       );
     }
     return this.props.children;
