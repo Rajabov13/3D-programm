@@ -1,5 +1,5 @@
 /**
- * End-to-end smoke test (demo mode) against a running build.
+ * End-to-end smoke test against a running build.
  *   npm run build && npm run preview   (in another terminal)
  *   npm run smoke                      (BASE_URL defaults to http://localhost:4173)
  * Screenshots are written to test-results/screens/.
@@ -7,6 +7,7 @@
 const { mkdirSync } = require('node:fs');
 const path = require('node:path');
 const { loadPlaywright, loadFixtures, BASE } = require('./browser-helpers.cjs');
+const { playStage } = require('./game-helpers.cjs');
 
 const SCREENS = path.join(__dirname, '..', 'test-results', 'screens');
 mkdirSync(SCREENS, { recursive: true });
@@ -19,10 +20,10 @@ const ok = (cond, msg) => {
 };
 
 const ROUTES = [
-  '/', '/dashboard', '/courses', '/courses/html', '/courses/html/lessons/html-1', '/courses/react', '/missions', '/achievements', '/progress',
-  '/leaderboard', '/settings', '/profile', '/playground', '/practice/html-1-ex1', '/practice/py-1-ex1', '/admin', '/admin/courses', '/admin/courses/html',
-  '/admin/lessons/html-1', '/admin/exercises/html-1-ex1', '/admin/achievements', '/admin/missions', '/world', '/does-not-exist',
+  '/', '/map', '/zone/html', '/zone/react', '/play/html-1', '/play/css-1', '/boss/html', '/quests', '/badges', '/leaderboard', '/settings', '/profile', '/lab',
+  '/world', '/dashboard', '/does-not-exist',
 ];
+const SHOTS = ['/', '/map', '/zone/html', '/play/html-1', '/lab', '/world', '/quests', '/badges', '/profile'];
 
 async function unlabeledButtons(page) {
   return page.evaluate(() =>
@@ -34,15 +35,19 @@ async function unlabeledButtons(page) {
   );
 }
 
-async function newPage(browser, viewport, settings = {}) {
-  const context = await browser.newContext({ viewport, deviceScaleFactor: 1, hasTouch: viewport.width < 600, isMobile: viewport.width < 600 });
-  await context.addInitScript((s) => {
-    try {
-      if (!localStorage.getItem('cw.settings.v1')) localStorage.setItem('cw.settings.v1', JSON.stringify({ state: { graphicsQuality: '2d', hasSeenWorldIntro: true, ...s }, version: 1 }));
-    } catch {
-      /* sandboxed frame */
-    }
-  }, settings);
+async function newPage(browser, viewport, { settings = {}, lang = 'en' } = {}) {
+  const context = await browser.newContext({ viewport, deviceScaleFactor: 1, hasTouch: viewport.width < 600, isMobile: viewport.width < 600, locale: 'en-US' });
+  await context.addInitScript(
+    ([s, l]) => {
+      try {
+        if (!localStorage.getItem('cw.settings.v1')) localStorage.setItem('cw.settings.v1', JSON.stringify({ state: { graphicsQuality: '2d', hasSeenWorldIntro: true, sound: false, ...s }, version: 1 }));
+        if (l && !localStorage.getItem('cw.lang.v1')) localStorage.setItem('cw.lang.v1', JSON.stringify({ state: { lang: l }, version: 1 }));
+      } catch {
+        /* sandboxed frame */
+      }
+    },
+    [settings, lang],
+  );
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -50,94 +55,123 @@ async function newPage(browser, viewport, settings = {}) {
   return { context, page, errors };
 }
 
+const xpOf = async (page) => {
+  await page.goto(`${BASE}/profile`);
+  const label = await page.getByRole('link', { name: /XP/ }).first().getAttribute('aria-label');
+  return Number(/(\d+) XP/.exec(label || '')?.[1] ?? NaN);
+};
+
 (async () => {
   const { chromium } = loadPlaywright();
   const fixtures = loadFixtures();
+  const stage = (id) => fixtures.stages.find((s) => s.id === id);
   const browser = await chromium.launch();
 
-  for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mobile', { width: 390, height: 844 }]]) {
+  for (const [label, viewport, lang] of [
+    ['desktop', { width: 1440, height: 900 }, 'uz'],
+    ['mobile', { width: 390, height: 844 }, 'uz'],
+    ['desktop-ru', { width: 1280, height: 800 }, 'ru'],
+  ]) {
     console.log(`\nRoute sweep (${label})`);
-    const { context, page, errors } = await newPage(browser, viewport);
+    const { context, page, errors } = await newPage(browser, viewport, { lang });
     for (const route of ROUTES) {
       errors.length = 0;
       await page.goto(`${BASE}${route}`);
       const heading = page.locator('h1').first();
-      const visible = await heading.waitFor({ timeout: 20000 }).then(() => true).catch(() => false);
+      const seen = await heading.waitFor({ timeout: 20000 }).then(() => true).catch(() => false);
       await page.waitForTimeout(400);
       const unlabeled = await unlabeledButtons(page);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-      ok(visible && errors.length === 0 && unlabeled.length === 0 && overflow <= 1, `${route} ${visible ? '' : '(no h1) '}${errors.length ? `errors: ${errors.join(' | ').slice(0, 200)} ` : ''}${unlabeled.length ? `unlabeled: ${unlabeled.join(' ')} ` : ''}${overflow > 1 ? `horizontal overflow ${overflow}px` : ''}`);
-      if (['/', '/dashboard', '/courses/html/lessons/html-1', '/practice/html-1-ex1', '/world', '/admin'].includes(route)) {
-        await page.screenshot({ path: path.join(SCREENS, `${label}${route.replace(/\//g, '_') || '_home'}.png`) });
-      }
+      const htmlLang = await page.evaluate(() => document.documentElement.lang);
+      ok(
+        seen && errors.length === 0 && unlabeled.length === 0 && overflow <= 1 && htmlLang === lang,
+        `${route} ${seen ? '' : '(no h1) '}${errors.length ? `errors: ${errors.join(' | ').slice(0, 200)} ` : ''}${unlabeled.length ? `unlabeled: ${unlabeled.join(' ')} ` : ''}${overflow > 1 ? `horizontal overflow ${overflow}px ` : ''}${htmlLang !== lang ? `lang=${htmlLang}` : ''}`,
+      );
+      if (SHOTS.includes(route) && label !== 'desktop-ru') await page.screenshot({ path: path.join(SCREENS, `${label}${route.replace(/\//g, '_') || '_home'}.png`) });
+      if (label === 'desktop-ru' && ['/', '/map', '/play/html-1'].includes(route)) await page.screenshot({ path: path.join(SCREENS, `${label}${route.replace(/\//g, '_') || '_home'}.png`) });
     }
+    await page.goto(`${BASE}/dashboard`);
+    ok(await page.waitForURL(/\/map$/, { timeout: 10000 }).then(() => true).catch(() => false), 'old /dashboard link redirects to the map');
     if (label === 'mobile') {
-      await page.goto(`${BASE}/dashboard`);
-      await page.getByRole('button', { name: 'Open menu' }).click();
+      await page.goto(`${BASE}/map`);
+      await page.getByRole('button', { name: 'Menyuni ochish' }).click();
       ok(await visible(page.locator('#mobile-nav')), 'mobile navigation menu opens');
       await page.screenshot({ path: path.join(SCREENS, 'mobile_menu.png') });
-      await page.goto(`${BASE}/practice/html-1-ex1`);
-      await page.getByRole('tab', { name: 'Code' }).click();
-      ok(await visible(page.locator('.monaco-editor').first(), 15000), 'mobile workspace shows the editor tab');
-      await page.getByRole('tab', { name: 'Output' }).click();
-      ok(await visible(page.getByRole('button', { name: /^Run$/ })), 'mobile workspace keeps the Run button reachable');
+      await page.goto(`${BASE}/lab`);
+      await page.getByRole('tab', { name: 'Kod' }).click();
+      ok(await visible(page.locator('.monaco-editor').first(), 15000), 'mobile lab shows the editor tab');
+      await page.getByRole('tab', { name: 'Natija' }).click();
+      ok(await visible(page.getByRole('button', { name: /Ishga tushirish/ })), 'mobile lab keeps the Run button reachable');
     }
     await context.close();
   }
 
-  console.log('\nLearning journey (demo mode)');
+  console.log('\nLanguage switching');
   {
-    const { context, page, errors } = await newPage(browser, { width: 1440, height: 900 });
-    await page.goto(`${BASE}/courses/html/lessons/html-1`);
-    for (const answer of fixtures.quizzes['html-1']) await page.getByLabel(answer, { exact: true }).check();
-    await page.getByRole('button', { name: 'Submit answers' }).click();
-    ok(await visible(page.getByText(/Passed — 3\/3/), 10000), 'knowledge check passes with correct answers');
-    ok(await visible(page.getByText(/\+\d+ XP/).first(), 5000), 'reward notification shows XP');
-
-    const ex = fixtures.exercises.find((e) => e.id === 'html-1-ex1');
-    await page.evaluate(([id, files]) => localStorage.setItem('cw.draft.exercise.' + id, JSON.stringify(files)), [ex.id, ex.solution]);
-    await page.goto(`${BASE}/practice/html-1-ex1`);
-    await page.getByRole('button', { name: /^Check$/ }).click();
-    ok(await visible(page.getByText(/Saved in this browser · \+\d+ XP/), 20000), 'exercise passes and awards XP once');
-    await page.getByRole('button', { name: /^Check$/ }).click();
-    ok(await visible(page.getByText(/Already completed — no additional XP/), 20000), 'repeating the exercise awards no XP');
-
-    await page.goto(`${BASE}/courses/html/lessons/html-1`);
-    await page.getByRole('button', { name: /Complete lesson/ }).click();
-    ok(await visible(page.getByText(/Completed — 20 XP earned/), 10000), 'lesson completes after quiz + exercise');
-
-    await page.goto(`${BASE}/missions`);
-    await page.getByRole('button', { name: 'Claim reward' }).first().click();
-    ok(await visible(page.getByText(/Completed .*20\d\d/).first(), 10000), 'mission reward claimed');
-
-    await page.goto(`${BASE}/dashboard`);
-    const chip = await page.getByRole('link', { name: /^Level \d+, \d+ XP/ }).getAttribute('aria-label');
-    ok(/^Level 2, 130 XP/.test(chip || ''), `XP and level match the rules (${chip})`);
-    await page.goto(`${BASE}/courses`);
-    const css = page.getByRole('link', { name: /CSS Design Studio/ });
-    ok(await visible(css.getByText('Unlocked')), 'reaching level 2 unlocks the CSS Design Studio');
-    await page.screenshot({ path: path.join(SCREENS, 'journey_courses.png') });
-    ok(errors.length === 0, `no runtime errors during the journey ${errors.join(' | ')}`);
+    const { context, page, errors } = await newPage(browser, { width: 1280, height: 800 }, { lang: 'uz' });
+    await page.goto(`${BASE}/map`);
+    ok(await visible(page.getByRole('heading', { name: 'Olamlar', level: 1 })), 'Uzbek is the default');
+    await page.getByRole('radio', { name: 'Русский' }).first().click();
+    ok(await visible(page.getByRole('heading', { name: 'Миры', level: 1 })), 'switches to Russian instantly');
+    ok((await page.evaluate(() => document.documentElement.lang)) === 'ru', '<html lang> follows the language');
+    await page.getByRole('radio', { name: 'English' }).first().click();
+    ok(await visible(page.getByRole('heading', { name: 'Worlds', level: 1 })), 'switches to English');
+    await page.reload();
+    ok(await visible(page.getByRole('heading', { name: 'Worlds', level: 1 })), 'the choice is remembered');
+    ok(errors.length === 0, `no runtime errors ${errors.join(' | ')}`);
+    await context.close();
+  }
+  {
+    const context = await browser.newContext({ locale: 'ru-RU' });
+    const page = await context.newPage();
+    await page.goto(`${BASE}/map`);
+    ok(await visible(page.getByRole('heading', { name: 'Миры', level: 1 })), 'a Russian browser starts in Russian');
     await context.close();
   }
 
-  console.log('\nAdministration (demo)');
+  console.log('\nGame journey');
   {
-    const { context, page, errors } = await newPage(browser, { width: 1440, height: 900 });
-    await page.goto(`${BASE}/admin/exercises/react-3-ex1`);
-    await page.getByRole('button', { name: 'Validate solution' }).click();
-    ok(await visible(page.getByText('The solution passes every check'), 30000), 'admin validation: reference solution passes');
-    ok(await visible(page.getByText('The starter code does not pass (good)')), 'admin validation: starter code fails');
-    await page.screenshot({ path: path.join(SCREENS, 'admin_validate.png'), fullPage: false });
-    await page.goto(`${BASE}/admin/courses`);
-    await page.getByRole('switch', { name: 'Publish React Development Tower' }).click();
-    await page.waitForTimeout(500);
-    await page.goto(`${BASE}/courses`);
-    await page.getByRole('heading', { name: 'Courses', level: 1 }).waitFor();
-    ok((await page.locator('main ul > li > a[href^="/courses/"]').count()) === 4, 'unpublishing hides the course from learners');
-    await page.goto(`${BASE}/admin/courses`);
-    await page.getByRole('switch', { name: 'Publish React Development Tower' }).click();
-    ok(errors.length === 0, `no runtime errors in admin ${errors.join(' | ')}`);
+    const { context, page, errors } = await newPage(browser, { width: 1440, height: 900 }, { lang: 'en' });
+    ok((await playStage(page, BASE, stage('html-1'))) === 'done', 'stage html-1 played with perfect answers');
+    ok(await visible(page.getByText('Stage cleared!')), 'result screen appears');
+    ok((await page.getByRole('img', { name: '3/3 ⭐' }).count()) > 0, 'a perfect run earns 3 stars');
+    await page.screenshot({ path: path.join(SCREENS, 'journey_result.png') });
+    ok((await xpOf(page)) === 60, 'first clear: 10 + 3×10 XP, plus the “first step” and “flawless” badges (+20)');
+
+    ok((await playStage(page, BASE, stage('html-1'), { wrong: [0] })) === 'done', 'replay with one mistake (task is repeated at the end)');
+    ok((await page.getByRole('img', { name: '2/3 ⭐' }).count()) > 0, 'one mistake gives 2 stars');
+    ok(await visible(page.getByText(/XP for these stars was already/i)), 'replays award no XP');
+    ok((await xpOf(page)) === 60, 'XP unchanged after the replay');
+
+    ok((await playStage(page, BASE, stage('html-2'), { wrong: [0, 1, 2] })) === 'failed', 'three mistakes end the run');
+    ok(await visible(page.getByText('Out of hearts')), 'failure screen appears');
+    await page.screenshot({ path: path.join(SCREENS, 'journey_failed.png') });
+
+    await page.goto(`${BASE}/play/html-3`);
+    ok(await visible(page.getByText('This stage is still locked')), 'stages unlock in order');
+
+    for (const id of ['html-2', 'html-3', 'html-4', 'html-5']) ok((await playStage(page, BASE, stage(id))) === 'done', `stage ${id} cleared`);
+    ok(await visible(page.getByRole('button', { name: 'Fight the boss!' })), 'clearing the world offers the boss');
+
+    const boss = fixtures.bosses.find((b) => b.zoneId === 'html');
+    await page.evaluate((files) => localStorage.setItem('cw.draft.boss.html', JSON.stringify(files)), boss.starter);
+    await page.goto(`${BASE}/boss/html`);
+    await page.getByRole('button', { name: 'Check', exact: true }).first().click();
+    ok(await visible(page.getByText(/\d\/\d requirements met/).first(), 20000), 'the starter code does not beat the boss');
+    await page.evaluate((files) => localStorage.setItem('cw.draft.boss.html', JSON.stringify(files)), boss.solution);
+    await page.reload();
+    await page.getByRole('button', { name: 'Check', exact: true }).first().click();
+    ok(await visible(page.getByText('Boss defeated!'), 20000), 'a correct solution beats the boss');
+    await page.screenshot({ path: path.join(SCREENS, 'journey_boss.png') });
+
+    await page.goto(`${BASE}/quests`);
+    const claim = page.getByRole('button', { name: /^\+\d+$/ }).first();
+    await claim.click();
+    ok(await visible(page.getByText('Claimed').first()), 'a finished daily quest can be claimed');
+    await page.goto(`${BASE}/map`);
+    ok((await page.getByRole('link', { name: /CSS Studio/ }).getByText(/Unlocks at level/).count()) === 0, 'levelling up unlocks the CSS world');
+    await page.screenshot({ path: path.join(SCREENS, 'journey_map.png') });
+    ok(errors.length === 0, `no runtime errors during the journey ${errors.join(' | ')}`);
     await context.close();
   }
 
@@ -145,15 +179,23 @@ async function newPage(browser, viewport, settings = {}) {
   {
     // Software WebGL so the 3D path (not the 2D fallback) is exercised in headless CI.
     const gpu = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
-    const { context, page, errors } = await newPage(gpu, { width: 1440, height: 900 }, { graphicsQuality: 'low' });
+    const { context, page, errors } = await newPage(gpu, { width: 1440, height: 900 }, { settings: { graphicsQuality: 'low' }, lang: 'uz' });
     await page.goto(`${BASE}/world`);
     await page.locator('canvas').waitFor({ timeout: 30000 }).catch(() => undefined);
-    const loaded = await page.getByText('Initializing city grid…').waitFor({ state: 'detached', timeout: 90000 }).then(() => true).catch(() => false);
+    const loaded = await page.getByText('Shahar qurilmoqda…').waitFor({ state: 'detached', timeout: 90000 }).then(() => true).catch(() => false);
     ok(loaded && (await page.locator('canvas').count()) > 0, 'city scene renders');
+    await page.waitForTimeout(1500);
+    await page.screenshot({ path: path.join(SCREENS, 'world_3d_uz.png') });
     await page.keyboard.press('2');
-    ok(await visible(page.getByRole('heading', { name: 'CSS Design Studio' }), 8000), 'keyboard shortcut travels to a location and opens its panel');
-    await page.getByRole('button', { name: /Preview course|Enter CSS/ }).click();
-    ok(/\/courses\/css$/.test(page.url()), 'building panel opens the learning area');
+    ok(await visible(page.getByRole('heading', { name: 'CSS Studiyasi' }), 8000), 'keyboard shortcut travels to a location and opens its (translated) panel');
+    await page.waitForTimeout(2500);
+    await page.screenshot({ path: path.join(SCREENS, 'world_3d_panel.png') });
+    await page.getByRole('radio', { name: 'Русский' }).click();
+    ok(await visible(page.getByRole('heading', { name: 'Студия CSS' }), 5000), 'the world switches language live');
+    await page.waitForTimeout(1500);
+    await page.screenshot({ path: path.join(SCREENS, 'world_3d_ru.png') });
+    await page.getByRole('button', { name: 'Открыть', exact: true }).click();
+    ok(/\/zone\/css$/.test(page.url()), 'building panel opens the world');
     ok(errors.filter((e) => !/GPU stall|GL Driver/.test(e)).length === 0, `no runtime errors in the world ${errors.join(' | ')}`);
     await context.close();
     await gpu.close();
