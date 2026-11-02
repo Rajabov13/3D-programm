@@ -13,15 +13,6 @@ export const jsZone: Zone = {
       id: 'js-1',
       zoneId: 'js',
       title: tx('Oʻzgaruvchilar', 'Переменные', 'Variables'),
-      tip: {
-        text: tx(
-          'let — oʻzgaradigan, const — oʻzgarmas qiymat. console.log() natijani chiqaradi.',
-          'let — изменяемое значение, const — неизменяемое. console.log() выводит результат.',
-          'let holds a value that can change, const one that can’t. console.log() prints it.',
-        ),
-        code: 'let score = 0;\nscore = score + 10;\nconsole.log(score); // 10',
-        lang: 'js',
-      },
       tasks: [
         { kind: 'output', code: 'let a = 5;\na = a + 2;\nconsole.log(a);', lang: 'js', options: ['7', '5', '52', 'a'], answer: 0 },
         { kind: 'output', code: 'const name = "Ada";\nconsole.log(`Hi, ${name}!`);', lang: 'js', options: ['Hi, Ada!', 'Hi, ${name}!', 'Hi, name!', 'Ada'], answer: 0 },
@@ -35,15 +26,6 @@ export const jsZone: Zone = {
       id: 'js-2',
       zoneId: 'js',
       title: tx('Shartlar', 'Условия', 'Conditions'),
-      tip: {
-        text: tx(
-          'if (shart) { … } else { … } — shart rost boʻlsa, birinchi blok ishlaydi. === — qatʼiy tenglik.',
-          'if (условие) { … } else { … } — если условие истинно, работает первый блок. === — строгое равенство.',
-          'if (condition) { … } else { … } runs the first block when the condition is true. === is strict equality.',
-        ),
-        code: 'if (hp > 0) {\n  console.log("alive");\n} else {\n  console.log("game over");\n}',
-        lang: 'js',
-      },
       tasks: [
         {
           kind: 'output',
@@ -63,15 +45,6 @@ export const jsZone: Zone = {
       id: 'js-3',
       zoneId: 'js',
       title: tx('Massivlar va sikllar', 'Массивы и циклы', 'Arrays & loops'),
-      tip: {
-        text: tx(
-          'Massiv — roʻyxat [1, 2, 3]; indekslar 0 dan boshlanadi. for sikli amalni takrorlaydi.',
-          'Массив — список [1, 2, 3]; индексы начинаются с 0. Цикл for повторяет действие.',
-          'An array is a list [1, 2, 3]; indexes start at 0. A for loop repeats work.',
-        ),
-        code: 'const xp = [10, 20, 30];\nfor (const n of xp) {\n  console.log(n);\n}',
-        lang: 'js',
-      },
       tasks: [
         { kind: 'output', code: 'const a = [3, 5, 7];\nconsole.log(a[1]);', lang: 'js', options: ['5', '3', '7', 'undefined'], answer: 0 },
         { kind: 'output', code: 'const a = [1, 2, 3];\nconsole.log(a.length);', lang: 'js', options: ['3', '2', '4', '[1, 2, 3]'], answer: 0 },
@@ -89,15 +62,6 @@ export const jsZone: Zone = {
       id: 'js-4',
       zoneId: 'js',
       title: tx('Funksiyalar va obyektlar', 'Функции и объекты', 'Functions & objects'),
-      tip: {
-        text: tx(
-          'Funksiya — qayta ishlatiladigan kod, return natijani qaytaradi. Obyekt — kalit: qiymat juftlari.',
-          'Функция — переиспользуемый код, return возвращает результат. Объект — пары ключ: значение.',
-          'A function is reusable code and return gives back a result. An object holds key: value pairs.',
-        ),
-        code: 'const hero = { name: "Nova", hp: 3 };\nfunction heal(h) {\n  return h.hp + 1;\n}\nconsole.log(heal(hero)); // 4',
-        lang: 'js',
-      },
       tasks: [
         { kind: 'output', code: 'function add(a, b) {\n  return a + b;\n}\nconsole.log(add(2, 3));', lang: 'js', options: ['5', '23', 'undefined', 'add'], answer: 0 },
         { kind: 'output', code: 'const hero = { name: "Nova", hp: 3 };\nconsole.log(hero.hp);', lang: 'js', options: ['3', 'Nova', 'hp', 'undefined'], answer: 0 },
@@ -115,15 +79,6 @@ export const jsZone: Zone = {
       id: 'js-5',
       zoneId: 'js',
       title: tx('DOM va asinxronlik', 'DOM и асинхронность', 'DOM & async'),
-      tip: {
-        text: tx(
-          'querySelector elementni topadi, addEventListener hodisani tinglaydi, setTimeout esa kodni keyinroq bajaradi.',
-          'querySelector находит элемент, addEventListener слушает событие, а setTimeout выполняет код позже.',
-          'querySelector finds an element, addEventListener listens for events and setTimeout runs code later.',
-        ),
-        code: 'const btn = document.querySelector("#play");\nbtn.addEventListener("click", () => {\n  console.log("Start!");\n});',
-        lang: 'js',
-      },
       tasks: [
         {
           kind: 'pick',

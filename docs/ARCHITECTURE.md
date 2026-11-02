@@ -31,7 +31,7 @@ All state is per browser:
 | `/` | Landing |
 | `/map` | Player strip, “continue” button, today’s quests, world cards |
 | `/zone/:zoneId` | Stage path of a world (zig-zag nodes with stars) and the boss node |
-| `/play/:stageId` | Full-screen mini-game run (tip → tasks → result) |
+| `/play/:stageId` | Full-screen stage: learning cards (info → picture → example) → test tasks → result |
 | `/boss/:zoneId` | Boss fight: task + requirement checklist + editor/preview/console |
 | `/quests`, `/badges`, `/leaderboard`, `/profile`, `/settings`, `/lab`, `/world` | Hub pages, code lab, 3D city |
 
@@ -51,9 +51,31 @@ Links from the earlier course-based version (`/dashboard`, `/courses/*`, `/missi
   (`stage:id`, `stage:id:starN`, `boss:zone`, `badge:id`, `quest:day:id`), so nothing pays twice.
 - Daily quests and the streak use the local calendar day.
 
+## Learning cards
+
+`src/game/learn/<world>.ts` maps every stage id to 2–4 `LearnCard`s (`src/game/types.ts`):
+
+```ts
+{ icon: '🏷️', title: tx(…), text: tx(…),          // info: one or two short sentences
+  picture?: Picture,                             // parts | boxes | list | table | compare | boxmodel | browser
+  example: { code, lang, result, caption? } }    // result: { kind: 'browser', html?, css?, title? } | { kind: 'terminal', lines }
+```
+
+- `parts` highlights pieces of code with a legend; `boxes` draws variables/fields; `list` draws an array with
+  its indexes (optionally negative); `table` is a two-column cheat sheet (`verify: 'js-expr' | 'py-expr'` runs the
+  left column in tests); `compare` renders CSS declarations side by side; `boxmodel` is the CSS box diagram.
+- `browser` results render in a shadow root: styles are isolated, content comes from an inert `<template>`
+  (scripts, inline handlers, iframes removed), links and forms don’t navigate, images become local SVG
+  placeholders and media sources are dropped — no network requests and no code execution.
+- The stage screen requires going through the cards before the test (a skip button appears only after the
+  stage was cleared or tried once); the 📖 Notes button reopens them during the test.
+- `content.dom.test.ts` checks: complete translations, short texts, script-free pages, real output of every
+  JS/Python example, and **coverage** — every correct `pick`/`blank` answer, `look` declaration and `match` item
+  of the test must appear on that stage’s cards.
+
 ## Content format
 
-`src/game/content/<world>.ts` — each world has 5 stages (tip + 6 tasks) and a boss. Code and options are
+`src/game/content/<world>.ts` — each world has 5 stages (6 test tasks each) and a boss; the cards live in `src/game/learn/`. Code and options are
 language-neutral; translated text uses `tx(uz, ru, en)`. Task kinds:
 
 | Kind | Fields |
@@ -153,8 +175,9 @@ isolated execution service.
 
 ## Extending
 
-- **New stage or task**: add it to `src/game/content/<world>.ts` and run `npm test` — the content tests
-  execute the answers and check translations.
+- **New stage or task**: add it to `src/game/content/<world>.ts`, teach any new answer on the stage’s cards in
+  `src/game/learn/<world>.ts`, and run `npm test` — the tests execute answers and examples, check translations
+  and fail if a test answer isn’t taught on the cards.
 - **New world**: add a `Zone` file, register it in `src/game/content/index.ts`, add a building in
   `src/data/buildings.ts` (+ a shape in `src/three/buildings/shapes.tsx`) and its `b.*`/`bd.*` names in
   the three dictionaries.

@@ -6,9 +6,9 @@
 |---|---|
 | `npm run typecheck` | Strict TypeScript (a missing translation key fails compilation) |
 | `npm run lint` | ESLint + React hooks rules |
-| `npm test` | Check engine; game rules (levels, stars, idempotent XP, unlock order, bosses, quests, badges, streaks); loop protection; sandbox bridge; collisions; **content integrity** — every JS/Python `output` answer and expression pair is executed, translations are complete in uz/ru/en, every boss solution passes and every starter fails, 3D sign glyphs are covered by the bundled font |
+| `npm test` | Check engine; game rules (levels, stars, idempotent XP, unlock order, bosses, quests, badges, streaks); loop protection; sandbox bridge; collisions; **content integrity** — every JS/Python `output` answer and expression pair is executed, translations are complete in uz/ru/en, every boss solution passes and every starter fails, 3D sign glyphs are covered by the bundled font; **learning cards** — complete translations, short texts, every JS/Python example output executed, every test answer taught on the cards first |
 | `npm run build && npm run preview`, then `npm run verify:bosses` | All 5 boss solutions pass and all starters fail in the **real browser sandboxes** (web preview, JS worker, self-hosted Pyodide, React with runtime click checks) |
-| `npm run smoke` (with `preview` running) | Every route on desktop, mobile and in Russian: `<h1>`, no runtime errors, no unlabeled controls, no horizontal overflow, correct `<html lang>`; language switching (instant, remembered, browser default); game journey (perfect run → 3 stars + exact XP, replay with a mistake → 2 stars and no XP, 3 mistakes → out of hearts, locked stages, boss starter fails / solution wins, quest claim, level-up unlocks CSS); 3D world render, keyboard travel, live language switch on the 3D panel, building entry |
+| `npm run smoke` (with `preview` running) | Every route on desktop, mobile and in Russian: `<h1>`, no runtime errors, no unlabeled controls, no horizontal overflow, correct `<html lang>`; language switching (instant, remembered, browser default); learning cards (cards before the test, highlighted picture, rendered example, ← / Next / Start the test, Notes during the test, all 78 cards on a phone in Russian without overflow or errors); game journey (perfect run → 3 stars + exact XP, replay with a mistake → 2 stars and no XP, 3 mistakes → out of hearts, locked stages, boss starter fails / solution wins, quest claim, level-up unlocks CSS); 3D world render, keyboard travel, live language switch on the 3D panel, building entry |
 
 ## Manual QA
 
@@ -19,7 +19,9 @@
 
 ### Game
 - [ ] Map: “Continue” goes to the next unfinished stage or boss; locked worlds say at which level they open.
-- [ ] Stage: tip card → Start; 1–4 picks an option, Enter checks/continues; hearts, combo, progress bar.
+- [ ] Stage: learning cards first — Maʼlumot (text) → Rasm (picture) → Namuna (example; “Show the result” renders the page/console); progress segments, ← → keys, Back/Next; “Start the test” on the last card; “Skip to the test” only after clearing or retrying the stage.
+- [ ] Card pages: links/forms don’t navigate, images show placeholders, no network requests (DevTools → Network).
+- [ ] Test: 📖 Notes opens all cards in a sheet; 1–4 picks an option, Enter checks/continues; hearts, combo, progress bar.
 - [ ] Each task kind works by mouse, touch and keyboard: pick, output, blank, order (tap to build, tap to remove), bug, match, look.
 - [ ] A mistake shows the correct answer and repeats the task at the end; 3 mistakes → “Out of hearts”.
 - [ ] Result screen: stars animate, confetti (not with reduced motion), XP / accuracy / best combo, Next / Again / Map.

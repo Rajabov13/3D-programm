@@ -22,6 +22,15 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* Show code exactly as typed: no => → ⇒ or != → ≠ ligatures while learning syntax. */
+  code,
+  pre,
+  kbd,
+  .font-mono {
+    font-variant-ligatures: none;
+    font-feature-settings: 'liga' 0, 'calt' 0;
+  }
+
   body {
     @apply min-h-screen font-sans;
     background-image:

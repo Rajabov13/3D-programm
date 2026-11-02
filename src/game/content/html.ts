@@ -13,15 +13,6 @@ export const htmlZone: Zone = {
       id: 'html-1',
       zoneId: 'html',
       title: tx('Teglar', 'Теги', 'Tags'),
-      tip: {
-        text: tx(
-          'HTML elementlari teglardan iborat: ochuvchi <p> va yopuvchi </p>.',
-          'Элементы HTML состоят из тегов: открывающего <p> и закрывающего </p>.',
-          'HTML elements are made of tags: an opening <p> and a closing </p>.',
-        ),
-        code: '<h1>Code World</h1>\n<p>Hello!</p>',
-        lang: 'html',
-      },
       tasks: [
         { kind: 'pick', q: tx('Eng katta sarlavha', 'Самый крупный заголовок', 'The biggest heading'), options: ['<h1>', '<h6>', '<p>', '<head>'], answer: 0 },
         { kind: 'pick', q: tx('Yopuvchi teg', 'Закрывающий тег', 'A closing tag'), options: ['</p>', '<p>', '<p/>', '<\\p>'], answer: 0 },
@@ -35,15 +26,6 @@ export const htmlZone: Zone = {
       id: 'html-2',
       zoneId: 'html',
       title: tx('Matn va roʻyxatlar', 'Текст и списки', 'Text & lists'),
-      tip: {
-        text: tx(
-          '<ul> — belgili roʻyxat, <ol> — raqamli, <li> — uning bandi.',
-          '<ul> — маркированный список, <ol> — нумерованный, <li> — его пункт.',
-          '<ul> is a bulleted list, <ol> a numbered one, and <li> is an item.',
-        ),
-        code: '<ul>\n  <li>HTML</li>\n  <li>CSS</li>\n</ul>',
-        lang: 'html',
-      },
       tasks: [
         { kind: 'pick', q: tx('Raqamli roʻyxat', 'Нумерованный список', 'A numbered list'), options: ['<ol>', '<ul>', '<li>', '<dl>'], answer: 0 },
         { kind: 'pick', q: tx('Roʻyxat bandi', 'Пункт списка', 'A list item'), options: ['<li>', '<ul>', '<item>', '<list>'], answer: 0 },
@@ -57,15 +39,6 @@ export const htmlZone: Zone = {
       id: 'html-3',
       zoneId: 'html',
       title: tx('Havolalar va rasmlar', 'Ссылки и картинки', 'Links & images'),
-      tip: {
-        text: tx(
-          '<a href="…"> — havola, <img src="…" alt="…"> — rasm (alt — uning tavsifi).',
-          '<a href="…"> — ссылка, <img src="…" alt="…"> — картинка (alt — её описание).',
-          '<a href="…"> is a link, <img src="…" alt="…"> an image (alt describes it).',
-        ),
-        code: '<a href="https://mdn.dev">MDN</a>\n<img src="cat.png" alt="A cat">',
-        lang: 'html',
-      },
       tasks: [
         { kind: 'pick', q: tx('Havola manzili atributi', 'Атрибут адреса ссылки', 'The link address attribute'), options: ['href', 'src', 'alt', 'link'], answer: 0 },
         { kind: 'pick', q: tx('Rasmning matnli tavsifi', 'Текстовое описание картинки', 'An image’s text description'), options: ['alt', 'title', 'src', 'href'], answer: 0 },
@@ -79,15 +52,6 @@ export const htmlZone: Zone = {
       id: 'html-4',
       zoneId: 'html',
       title: tx('Sahifa tuzilishi', 'Структура страницы', 'Page structure'),
-      tip: {
-        text: tx(
-          '<header>, <nav>, <main>, <footer> — sahifa qismlarining maʼnosini bildiradi.',
-          '<header>, <nav>, <main>, <footer> описывают смысл частей страницы.',
-          '<header>, <nav>, <main> and <footer> describe what each part of a page is.',
-        ),
-        code: '<header>…</header>\n<main>…</main>\n<footer>…</footer>',
-        lang: 'html',
-      },
       tasks: [
         { kind: 'pick', q: tx('Sayt menyusi uchun teg', 'Тег для меню сайта', 'The tag for site navigation'), options: ['<nav>', '<menu>', '<header>', '<main>'], answer: 0 },
         { kind: 'pick', q: tx('Sahifaning asosiy qismi', 'Главная часть страницы', 'The main content of a page'), options: ['<main>', '<body>', '<section>', '<div>'], answer: 0 },
@@ -101,15 +65,6 @@ export const htmlZone: Zone = {
       id: 'html-5',
       zoneId: 'html',
       title: tx('Formalar', 'Формы', 'Forms'),
-      tip: {
-        text: tx(
-          '<form> ichida <label> va <input> ishlatiladi: label for = input id.',
-          'Внутри <form> используются <label> и <input>: for у label = id у input.',
-          'Inside a <form>, pair each <label> with an <input>: label for = input id.',
-        ),
-        code: '<label for="mail">Email</label>\n<input id="mail" type="email">',
-        lang: 'html',
-      },
       tasks: [
         { kind: 'pick', q: tx('Email kiritish maydoni', 'Поле для email', 'An email field'), options: ['<input type="email">', '<input type="text">', '<email>', '<input mail>'], answer: 0 },
         { kind: 'pick', q: tx('Maydonni majburiy qilish', 'Сделать поле обязательным', 'Make a field required'), options: ['required', 'needed', 'must', 'important'], answer: 0 },

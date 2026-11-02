@@ -78,7 +78,6 @@ export const uz = {
   'play.quitTitle': 'Bosqichdan chiqasizmi?',
   'play.quitBody': 'Bu urinish natijasi saqlanmaydi.',
   'play.stay': 'Qolish',
-  'play.tip': 'Maslahat',
   'play.complete': 'Bosqich yakunlandi!',
   'play.failed': 'Yuraklar tugadi',
   'play.failedHint': 'Maslahatni qayta koʻring va yana urinib koʻring.',
@@ -279,6 +278,22 @@ export const uz = {
   'boss.hint': "Kodni yozing, ▶ bilan sinang, soʻng “Tekshirish”ni bosing.",
   'boss.fight': "Jangga!",
   'boss.all': "Barcha talablar bajarildi!",
+
+  'learn.info': "Maʼlumot",
+  'learn.example': "Namuna",
+  'learn.test': "Test",
+  'learn.result': "Natija",
+  'learn.run': "Natijani koʻrish",
+  'learn.next': "Keyingi",
+  'learn.start': "Testni boshlash",
+  'learn.skip': "Testga oʻtish",
+  'learn.review': "Eslatma",
+  'learn.progress': "Maʼlumot {n} / {total}",
+  'learn.ready': "{n} ta savol · 3 ta yurak",
+  'learn.code': "Kod",
+  'learn.means': "Maʼnosi",
+  'learn.index': "indeks",
+  'learn.picture': "Rasm",
 } as const;
 
 export type DictKey = keyof typeof uz;

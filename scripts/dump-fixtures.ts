@@ -1,6 +1,7 @@
 // Writes the game's answer keys and boss solutions as JSON for the browser test scripts.
 import { writeFileSync } from 'node:fs';
 import { STAGES, ZONES } from '../src/game/content';
+import { learnFor } from '../src/game/learn';
 import type { Task } from '../src/game/types';
 
 /** How a test clicks the correct answer for each task. */
@@ -24,7 +25,7 @@ const target = process.argv[2] ?? 'test-results/fixtures.json';
 writeFileSync(
   target,
   JSON.stringify({
-    stages: STAGES.map((s) => ({ id: s.id, zoneId: s.zoneId, tasks: s.tasks.map(answerOf) })),
+    stages: STAGES.map((s) => ({ id: s.id, zoneId: s.zoneId, cards: learnFor(s.id).length, tasks: s.tasks.map(answerOf) })),
     bosses: ZONES.map((z) => ({
       zoneId: z.id,
       mode: z.boss.mode,

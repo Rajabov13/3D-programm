@@ -17,15 +17,6 @@ export const reactZone: Zone = {
       id: 'react-1',
       zoneId: 'react',
       title: tx('Komponentlar va JSX', 'Компоненты и JSX', 'Components & JSX'),
-      tip: {
-        text: tx(
-          'Komponent — interfeys qaytaradigan funksiya, nomi katta harf bilan boshlanadi. JSX da class emas, className.',
-          'Компонент — функция, возвращающая интерфейс; имя с большой буквы. В JSX вместо class пишут className.',
-          'A component is a function that returns UI, named with a capital letter. JSX uses className, not class.',
-        ),
-        code: 'function Hello() {\n  return <h1 className="title">Hello</h1>;\n}',
-        lang: 'jsx',
-      },
       tasks: [
         { kind: 'pick', q: tx('Toʻgʻri komponent nomi', 'Правильное имя компонента', 'A valid component name'), options: ['HeroCard', 'heroCard', 'hero-card', 'hero_card'], answer: 0 },
         { kind: 'pick', q: tx('JSX da CSS klassi', 'CSS-класс в JSX', 'A CSS class in JSX'), options: ['className="card"', 'class="card"', 'css="card"', 'style="card"'], answer: 0 },
@@ -39,15 +30,6 @@ export const reactZone: Zone = {
       id: 'react-2',
       zoneId: 'react',
       title: tx('Props', 'Props', 'Props'),
-      tip: {
-        text: tx(
-          'Props — komponentga tashqaridan beriladigan maʼlumot: <Card title="Hi" />.',
-          'Props — данные, которые передаются компоненту снаружи: <Card title="Hi" />.',
-          'Props are data passed into a component from outside: <Card title="Hi" />.',
-        ),
-        code: 'function Card({ title }) {\n  return <h2>{title}</h2>;\n}\n\n<Card title="Hi" />',
-        lang: 'jsx',
-      },
       tasks: [
         {
           kind: 'pick',
@@ -66,15 +48,6 @@ export const reactZone: Zone = {
       id: 'react-3',
       zoneId: 'react',
       title: tx('Holat (useState)', 'Состояние (useState)', 'State (useState)'),
-      tip: {
-        text: tx(
-          'useState qiymatni eslab qoladi; setter chaqirilsa, komponent qayta chiziladi.',
-          'useState запоминает значение; вызов сеттера перерисовывает компонент.',
-          'useState remembers a value; calling the setter re-renders the component.',
-        ),
-        code: 'const [count, setCount] = useState(0);\n<button onClick={() => setCount(count + 1)}>{count}</button>',
-        lang: 'jsx',
-      },
       tasks: [
         { kind: 'pick', q: tx('Holat (state) hooki', 'Хук состояния', 'The state hook'), options: ['useState', 'useEffect', 'useMemo', 'useRef'], answer: 0 },
         { kind: 'blank', code: 'const [count, ___] = useState(0);', lang: 'jsx', options: ['setCount', 'count', 'useCount', 'getCount'], answer: 0 },
@@ -92,15 +65,6 @@ export const reactZone: Zone = {
       id: 'react-4',
       zoneId: 'react',
       title: tx('Roʻyxatlar va shartlar', 'Списки и условия', 'Lists & conditions'),
-      tip: {
-        text: tx(
-          'Roʻyxat map() bilan chiziladi, har bir elementga key kerak. && va ? : — shartli koʻrsatish.',
-          'Список рисуется через map(), каждому элементу нужен key. && и ? : — условный показ.',
-          'Render lists with map(); each item needs a key. && and ? : show things conditionally.',
-        ),
-        code: '{items.map((it) => (\n  <li key={it.id}>{it.name}</li>\n))}',
-        lang: 'jsx',
-      },
       tasks: [
         { kind: 'pick', q: tx('Roʻyxat elementi uchun kalit', 'Ключ для элемента списка', 'The key for a list item'), options: ['key={item.id}', 'id={item.key}', 'index', 'ref={item}'], answer: 0 },
         { kind: 'blank', code: '{items.___((item) => (\n  <li key={item.id}>{item.name}</li>\n))}', lang: 'jsx', options: ['map', 'forEach', 'filter', 'each'], answer: 0 },
@@ -114,15 +78,6 @@ export const reactZone: Zone = {
       id: 'react-5',
       zoneId: 'react',
       title: tx('Effektlar va formalar', 'Эффекты и формы', 'Effects & forms'),
-      tip: {
-        text: tx(
-          'useEffect tashqi ishlarni bajaradi (sarlavha, taymer). Boshqariladigan input: value + onChange.',
-          'useEffect выполняет внешние действия (заголовок, таймер). Управляемый input: value + onChange.',
-          'useEffect does outside work (titles, timers). A controlled input uses value + onChange.',
-        ),
-        code: 'useEffect(() => {\n  document.title = name;\n}, [name]);\n<input value={name} onChange={(e) => setName(e.target.value)} />',
-        lang: 'jsx',
-      },
       tasks: [
         { kind: 'pick', q: tx('Tashqi ishlar uchun hook', 'Хук для внешних действий', 'The hook for side effects'), options: ['useEffect', 'useState', 'useMemo', 'useId'], answer: 0 },
         { kind: 'blank', code: '<input value={name} ___={(e) => setName(e.target.value)} />', lang: 'jsx', options: ['onChange', 'onType', 'change', 'onValue'], answer: 0 },

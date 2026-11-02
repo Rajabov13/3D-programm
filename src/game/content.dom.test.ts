@@ -11,7 +11,8 @@ import { evaluateChecks, normalizeOutput, requiresOutput, validateCheckSpecs, ty
 import { buildings } from '@/data/buildings';
 import { DICTS, type L10n } from '@/i18n';
 import { BADGES, QUESTS, STAGES, ZONES } from './content';
-import type { Boss } from './types';
+import { learnFor } from './learn';
+import type { Boss, LearnCard } from './types';
 
 const hasPython = spawnSync('python3', ['--version']).status === 0;
 const runNode = (code: string) => {
@@ -43,7 +44,6 @@ describe('game structure', () => {
   it('has complete translations for all content', () => {
     for (const s of STAGES) {
       filled(s.title, `${s.id} title`);
-      filled(s.tip.text, `${s.id} tip`);
       s.tasks.forEach((t, i) => {
         if (t.kind === 'pick') filled(t.q, `${s.id} task ${i + 1}`);
       });
@@ -122,6 +122,91 @@ describe.each(STAGES.map((s) => [s.id, s] as const))('stage %s', (_id, stage) =>
         for (const [left, right] of t.pairs) expect(runPy(`print(${left})`).trim(), left).toBe(right);
       }
     }
+  });
+});
+
+/** Every piece of text a learner sees on a stage's cards (all languages), whitespace removed. */
+function cardMaterial(cards: LearnCard[]): string {
+  const parts: string[] = [];
+  const add = (v: unknown) => {
+    if (typeof v === 'string') parts.push(v);
+    else if (v && typeof v === 'object') Object.values(v).forEach(add);
+  };
+  cards.forEach(add);
+  return parts.join('\n').replace(/\s+/g, '');
+}
+
+const squash = (s: string) => s.replace(/\s+/g, '');
+
+describe.each(STAGES.map((s) => [s.id, s] as const))('learning cards %s', (_id, stage) => {
+  const cards = learnFor(stage.id);
+
+  it('has 2–4 complete cards', () => {
+    expect(cards.length).toBeGreaterThanOrEqual(2);
+    expect(cards.length).toBeLessThanOrEqual(4);
+    cards.forEach((c, i) => {
+      const where = `${stage.id} card ${i + 1}`;
+      expect(c.icon.trim(), where).toBeTruthy();
+      filled(c.title, `${where} title`);
+      filled(c.text, `${where} text`);
+      if (c.example.caption) filled(c.example.caption, `${where} caption`);
+      // Short texts only: the cards must stay quick to read.
+      for (const lang of ['uz', 'ru', 'en'] as const) expect(c.text[lang].length, `${where} text [${lang}] is too long`).toBeLessThanOrEqual(240);
+      const p = c.picture;
+      if (p?.kind === 'parts') {
+        let rest = p.code;
+        for (const part of p.parts) {
+          const at = rest.indexOf(part.text);
+          expect(at, `${where}: “${part.text}” must appear (in order) in the picture code`).toBeGreaterThanOrEqual(0);
+          rest = rest.slice(at + part.text.length);
+          filled(part.label, `${where} part ${part.text}`);
+        }
+      }
+      if (p?.kind === 'table') {
+        if (p.head) p.head.forEach((h) => typeof h !== 'string' && filled(h, `${where} head`));
+        p.rows.forEach(([, right]) => typeof right !== 'string' && filled(right, `${where} row`));
+      }
+      const r = c.example.result;
+      if (r.kind === 'browser') {
+        expect(Boolean(r.html) || c.example.lang === 'html', `${where}: browser result needs html`).toBe(true);
+      }
+      if (p?.kind === 'browser') expect(p.html).toBeTruthy();
+      // Pages are rendered without scripts: keep the content script-free.
+      const pages = [r.kind === 'browser' ? (r.html ?? (c.example.lang === 'html' ? c.example.code : '')) : '', p?.kind === 'browser' ? p.html : ''];
+      for (const html of pages) expect(html, where).not.toMatch(/<script|\son\w+\s*=/i);
+    });
+  });
+
+  it('shows the real output of every runnable example', () => {
+    for (const c of cards) {
+      const r = c.example.result;
+      if (r.kind !== 'terminal') continue;
+      if (c.example.lang === 'js') expect(normalizeOutput(runNode(c.example.code)), c.example.code).toBe(normalizeOutput(r.lines.join('\n')));
+      if (c.example.lang === 'py' && hasPython) expect(normalizeOutput(runPy(c.example.code)), c.example.code).toBe(normalizeOutput(r.lines.join('\n')));
+      expect(['js', 'py']).toContain(c.example.lang);
+    }
+    for (const c of cards) {
+      const p = c.picture;
+      if (p?.kind !== 'table' || !p.verify) continue;
+      for (const [left, right] of p.rows) {
+        const out = p.verify === 'js-expr' ? runNode(`console.log(JSON.stringify(${left}))`).trim() : hasPython ? runPy(`print(${left})`).trim() : right;
+        expect(out, left).toBe(right);
+      }
+    }
+  });
+
+  it('teaches every answer before the test asks for it', () => {
+    const material = cardMaterial(cards);
+    const missing: string[] = [];
+    const need = (text: string) => {
+      if (!material.includes(squash(text))) missing.push(text);
+    };
+    for (const t of stage.tasks) {
+      if (t.kind === 'pick' || t.kind === 'blank') need(t.options[t.answer]);
+      if (t.kind === 'look') need(t.code);
+      if (t.kind === 'match') t.pairs.forEach(([left]) => need(left));
+    }
+    expect(missing, `not taught on the cards of ${stage.id}`).toEqual([]);
   });
 });
 

@@ -13,15 +13,6 @@ export const pythonZone: Zone = {
       id: 'py-1',
       zoneId: 'python',
       title: tx('print va oʻzgaruvchilar', 'print и переменные', 'print & variables'),
-      tip: {
-        text: tx(
-          'print() natijani chiqaradi; f-satrda oʻzgaruvchi {} ichiga yoziladi.',
-          'print() выводит результат; в f-строке переменные пишутся внутри {}.',
-          'print() shows output; in an f-string you put variables inside {}.',
-        ),
-        code: 'name = "Ada"\nprint(f"Hi, {name}!")',
-        lang: 'py',
-      },
       tasks: [
         { kind: 'output', code: 'x = 3\nx = x * 2\nprint(x)', lang: 'py', options: ['6', '3', 'x * 2', '9'], answer: 0 },
         { kind: 'output', code: 'name = "Ada"\nprint(f"Hi, {name}!")', lang: 'py', options: ['Hi, Ada!', 'Hi, {name}!', 'Hi, name!', 'Ada'], answer: 0 },
@@ -35,15 +26,6 @@ export const pythonZone: Zone = {
       id: 'py-2',
       zoneId: 'python',
       title: tx('Shartlar va sikllar', 'Условия и циклы', 'Conditions & loops'),
-      tip: {
-        text: tx(
-          'if / elif / else qaror qabul qiladi; for i in range(3) — 0, 1, 2. Ichki qatorlar 4 ta probel bilan surilgan.',
-          'if / elif / else принимают решения; for i in range(3) — это 0, 1, 2. Тело пишется с отступом в 4 пробела.',
-          'if / elif / else make decisions; for i in range(3) gives 0, 1, 2. Indent the body by 4 spaces.',
-        ),
-        code: 'for i in range(3):\n    if i == 1:\n        print("one")',
-        lang: 'py',
-      },
       tasks: [
         { kind: 'output', code: 'for i in range(3):\n    print(i)', lang: 'py', options: ['0\n1\n2', '1\n2\n3', '0\n1\n2\n3', '3'], answer: 0 },
         { kind: 'output', code: 'n = 7\nif n % 2 == 0:\n    print("even")\nelse:\n    print("odd")', lang: 'py', options: ['odd', 'even', '7', '1'], answer: 0 },
@@ -57,15 +39,6 @@ export const pythonZone: Zone = {
       id: 'py-3',
       zoneId: 'python',
       title: tx('Roʻyxatlar va lugʻatlar', 'Списки и словари', 'Lists & dictionaries'),
-      tip: {
-        text: tx(
-          'Roʻyxat — [1, 2, 3], lugʻat — {"kalit": qiymat}. [-1] — oxirgi element.',
-          'Список — [1, 2, 3], словарь — {"ключ": значение}. [-1] — последний элемент.',
-          'A list is [1, 2, 3], a dict is {"key": value}. [-1] is the last item.',
-        ),
-        code: 'hero = {"name": "Nova", "items": ["sword"]}\nhero["items"].append("shield")\nprint(hero["items"][-1])',
-        lang: 'py',
-      },
       tasks: [
         { kind: 'output', code: 'nums = [4, 8, 15]\nprint(nums[-1])', lang: 'py', options: ['15', '4', '8', '-1'], answer: 0 },
         { kind: 'output', code: 'hero = {"name": "Nova", "hp": 3}\nprint(hero["name"])', lang: 'py', options: ['Nova', 'name', '3', 'hero'], answer: 0 },
@@ -83,15 +56,6 @@ export const pythonZone: Zone = {
       id: 'py-4',
       zoneId: 'python',
       title: tx('Funksiyalar', 'Функции', 'Functions'),
-      tip: {
-        text: tx(
-          'def bilan funksiya yaratiladi; return natijani qaytaradi, aks holda None qaytadi.',
-          'Функция создаётся через def; return возвращает результат, иначе возвращается None.',
-          'def creates a function; return gives back a result, otherwise it returns None.',
-        ),
-        code: 'def square(n):\n    return n * n\n\nprint(square(4))',
-        lang: 'py',
-      },
       tasks: [
         { kind: 'output', code: 'def add(a, b):\n    return a + b\n\nprint(add(2, 5))', lang: 'py', options: ['7', '25', 'None', 'add'], answer: 0 },
         { kind: 'output', code: 'def greet(name="friend"):\n    return "Hi " + name\n\nprint(greet())', lang: 'py', options: ['Hi friend', 'Hi', 'Hi name', 'None'], answer: 0 },
@@ -105,15 +69,6 @@ export const pythonZone: Zone = {
       id: 'py-5',
       zoneId: 'python',
       title: tx('Klasslar', 'Классы', 'Classes'),
-      tip: {
-        text: tx(
-          'class — obyekt chizmasi. __init__ boshlangʻich qiymatlarni beradi, self — obyektning oʻzi.',
-          'class — чертёж объекта. __init__ задаёт начальные значения, self — сам объект.',
-          'A class is a blueprint. __init__ sets starting values; self is the object itself.',
-        ),
-        code: 'class Hero:\n    def __init__(self, name):\n        self.name = name\n\nprint(Hero("Nova").name)',
-        lang: 'py',
-      },
       tasks: [
         {
           kind: 'output',

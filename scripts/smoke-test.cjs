@@ -129,6 +129,65 @@ const xpOf = async (page) => {
     await context.close();
   }
 
+  console.log('\nLearning cards (info → example → test)');
+  {
+    const { context, page, errors } = await newPage(browser, { width: 1280, height: 860 }, { lang: 'uz' });
+    await page.goto(`${BASE}/play/html-3`);
+    ok(await visible(page.getByText('Bu bosqich hali yopiq')), 'a locked stage shows no cards');
+    await page.goto(`${BASE}/play/html-1`);
+    ok(await visible(page.getByRole('heading', { name: 'Teg nima?' })), 'a stage opens with its first learning card, not the test');
+    ok((await page.getByRole('button', { name: 'Testni boshlash' }).count()) === 0, 'the test can’t start before the cards are read');
+    ok((await page.getByText('Maʼlumot', { exact: true }).count()) > 0 && (await page.getByText('Namuna', { exact: true }).count()) > 0, 'cards are labelled “Maʼlumot” and “Namuna”');
+    ok((await page.locator('mark').count()) >= 3, 'the picture highlights the parts of the code');
+    await page.getByRole('button', { name: 'Natijani koʻrish' }).click();
+    const rendered = await page.waitForFunction(() => Array.from(document.querySelectorAll('div')).some((d) => d.shadowRoot?.textContent?.includes('Hello, world!')), null, { timeout: 5000 }).then(() => true).catch(() => false);
+    ok(rendered, 'the example result is rendered like a real page');
+    await page.screenshot({ path: path.join(SCREENS, 'learn_card_1.png'), fullPage: true });
+    for (let i = 1; i < stage('html-1').cards; i++) await page.getByRole('button', { name: 'Keyingi', exact: true }).click();
+    ok(await visible(page.getByRole('button', { name: 'Testni boshlash' })), 'the last card offers to start the test');
+    await page.screenshot({ path: path.join(SCREENS, 'learn_card_last.png'), fullPage: true });
+    await page.keyboard.press('ArrowLeft');
+    ok(await visible(page.getByRole('heading', { name: 'Sahifa skeleti' })), '← goes back one card');
+    await page.getByRole('button', { name: 'Keyingi', exact: true }).click();
+    await page.getByRole('button', { name: 'Testni boshlash' }).click();
+    ok(await visible(page.getByRole('radiogroup')), 'the test starts after the cards');
+    await page.getByRole('button', { name: 'Eslatma' }).click();
+    ok(await visible(page.getByRole('dialog').getByRole('heading', { name: 'Teg nima?' })), 'the notes sheet shows the cards during the test');
+    await page.screenshot({ path: path.join(SCREENS, 'learn_notes.png') });
+    await page.keyboard.press('Escape');
+
+    await page.goto(`${BASE}/play/py-1`);
+    const pyLocked = await visible(page.getByText('Bu bosqich hali yopiq'), 3000);
+    ok(pyLocked, 'other worlds stay locked at level 1');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`${BASE}/play/html-2`);
+    ok(await visible(page.getByText('Bu bosqich hali yopiq'), 3000), 'stage 2 is locked until stage 1 is cleared');
+    ok(errors.length === 0, `no runtime errors on the cards ${errors.join(' | ')}`);
+    await context.close();
+  }
+  {
+    // Every stage’s cards render (all picture kinds) in every language without errors.
+    const { context, page, errors } = await newPage(browser, { width: 390, height: 844 }, { lang: 'ru' });
+    const save = { state: { game: { version: 1, xp: 2000, stars: Object.fromEntries(fixtures.stages.map((s) => [s.id, 1])), bosses: {}, badges: {}, quests: {}, ledger: {}, history: [], days: {} } }, version: 1 };
+    await page.addInitScript((s) => localStorage.setItem('cw.game.v1', JSON.stringify(s)), save);
+    let shown = 0;
+    for (const s of fixtures.stages) {
+      await page.goto(`${BASE}/play/${s.id}`);
+      for (let i = 0; i < s.cards; i++) {
+        await page.getByRole('button', { name: 'Показать результат' }).click();
+        const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+        if (overflow <= 1) shown++;
+        else console.log(`    overflow ${overflow}px on ${s.id} card ${i + 1}`);
+        if (i < s.cards - 1) await page.getByRole('button', { name: 'Дальше', exact: true }).click();
+      }
+      if (['css-4', 'js-3', 'py-3', 'react-1'].includes(s.id)) await page.screenshot({ path: path.join(SCREENS, `learn_mobile_ru_${s.id}.png`), fullPage: true });
+    }
+    const total = fixtures.stages.reduce((n, s) => n + s.cards, 0);
+    ok(shown === total, `all ${total} cards open on a phone with their results and no sideways scrolling (${shown}/${total})`);
+    ok(errors.length === 0, `no runtime errors on any card ${errors.join(' | ')}`);
+    await context.close();
+  }
+
   console.log('\nGame journey');
   {
     const { context, page, errors } = await newPage(browser, { width: 1440, height: 900 }, { lang: 'en' });

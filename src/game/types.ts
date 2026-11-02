@@ -27,8 +27,50 @@ export interface Stage {
   id: string;
   zoneId: ZoneId;
   title: L10n;
-  tip: { text: L10n; code: string; lang: CodeLang };
   tasks: Task[];
+}
+
+// ─── Learning cards (info → picture → example, shown before the test) ───────
+
+/** A table cell: language-neutral text (code, emoji) or translated text. */
+export type Cell = string | L10n;
+
+/** A rendered web page (sandboxed: no scripts, no navigation, images become placeholders). */
+export interface BrowserView {
+  kind: 'browser';
+  /** Page HTML. In an example it defaults to the example code when that code is HTML. */
+  html?: string;
+  /** Page CSS. In an example it defaults to the example code when that code is CSS. */
+  css?: string;
+  /** Text for the mock browser tab (e.g. to show document.title). */
+  title?: string;
+}
+
+export type Picture =
+  /** Code with highlighted parts and a legend explaining each part. */
+  | { kind: 'parts'; code: string; lang: CodeLang; parts: Array<{ text: string; label: L10n }> }
+  /** Variables / fields drawn as labelled boxes. */
+  | { kind: 'boxes'; items: Array<{ name: string; value: string }> }
+  /** An array / list with its indexes. */
+  | { kind: 'list'; name: string; items: string[]; negative?: boolean }
+  /** A two-column cheat sheet (optionally verified by running the left column). */
+  | { kind: 'table'; head?: [Cell, Cell]; rows: Array<[string, Cell]>; verify?: 'js-expr' | 'py-expr' }
+  /** CSS declarations rendered side by side. */
+  | { kind: 'compare'; preview: 'text' | 'box' | 'row' | 'grid'; items: Array<{ code: string; style: StyleOption }> }
+  /** The CSS box model diagram. */
+  | { kind: 'boxmodel' }
+  | (BrowserView & { html: string });
+
+export type ExampleResult = BrowserView | { kind: 'terminal'; lines: string[] };
+
+export interface LearnCard {
+  /** A big emoji illustration. */
+  icon: string;
+  title: L10n;
+  /** One or two short sentences. */
+  text: L10n;
+  picture?: Picture;
+  example: { code: string; lang: CodeLang; result: ExampleResult; caption?: L10n };
 }
 
 export interface BossCheck {

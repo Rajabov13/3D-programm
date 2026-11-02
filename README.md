@@ -1,8 +1,9 @@
 # 3D Code World — demo version
 
 **Learn to code by playing.** A neon 3D city with five worlds — HTML, CSS, Python,
-JavaScript and React. Each world has 5 short stages of quick mini-games and ends with a
-**boss fight** where you write real code. Collect stars, keep your streak, finish daily
+JavaScript and React. Each world has 5 short stages. Every stage goes
+**info → example → test**: a few picture cards teach each new thing, then quick mini-games
+check it. Each world ends with a **boss fight** where you write real code. Collect stars, keep your streak, finish daily
 quests, earn badges and level up to unlock the next world.
 
 The interface is available in **Oʻzbekcha (default), Русский and English** — switch
@@ -16,7 +17,8 @@ any time with the UZ · RU · EN switcher (also on the 3D signs in the city).
 | | |
 |---|---|
 | 🗺 **Map** | Five worlds. HTML is open from the start; CSS and Python open at level 2, JavaScript at 3, React at 4. |
-| 🎮 **Stages** | 5 per world, 6 tasks each, about 2 minutes. A one-line tip, then mini-games: *pick the answer*, *what does it print?*, *fill the blank*, *build the code in order*, *find the bug*, *match pairs*, *which CSS looks like this?* |
+| 📘 **Learn first** | Every stage opens with 2–4 cards (78 in total). Each card has a short explanation (**Maʼlumot**), a picture — highlighted code parts, variable boxes, list indexes, a box-model diagram, side-by-side CSS previews or a cheat-sheet table — and an **example** (**Namuna**) whose result you reveal: a rendered mini web page or console output. The test starts only after the last card. |
+| 🎮 **Then the test** | 6 tasks, about 2 minutes: *pick the answer*, *what does it print?*, *fill the blank*, *build the code in order*, *find the bug*, *match pairs*, *which CSS looks like this?* The 📖 *Notes* button reopens the cards at any time. |
 | ❤️ **Hearts** | 3 per stage. A mistake costs a heart and the task comes back at the end. No hearts left → try again. |
 | ⭐ **Stars** | 0 mistakes = 3 stars, 1 = 2, 2 = 1. Combo counter for answers in a row. |
 | ⚔️ **Boss** | After all 5 stages: a real coding task in the Monaco editor, run in a sandbox and checked automatically (HTML page, CSS card, Python loop, JavaScript function, React counter). |
@@ -54,9 +56,9 @@ from your own origin — no third-party CDN at runtime. Optional settings are li
 | `npm run build` | Type-check + production build into `dist/` |
 | `npm run preview` | Serve the production build on :4173 |
 | `npm run typecheck` / `npm run lint` | TypeScript / ESLint |
-| `npm test` | Game rules, content integrity (every task answer is executed and verified), translations, sandbox helpers (Vitest) |
+| `npm test` | Game rules, content integrity (every task answer is executed and verified), learning cards (every example output is executed, and every test answer must be taught on the cards first), translations, sandbox helpers (Vitest) |
 | `npm run verify:bosses` | Runs every boss solution (and starter) through the real browser sandboxes (needs Playwright and a running `preview`) |
-| `npm run smoke` | End-to-end: every route on desktop/mobile/Russian, language switching, a full game journey (stages, hearts, stars, boss, quests, level-up) and the 3D world (needs Playwright and a running `preview`) |
+| `npm run smoke` | End-to-end: every route on desktop/mobile/Russian, language switching, the learning cards (all 78 open on a phone without errors), a full game journey (stages, hearts, stars, boss, quests, level-up) and the 3D world (needs Playwright and a running `preview`) |
 
 The two browser scripts use Playwright: `npm i -D playwright && npx playwright install chromium`.
 
@@ -67,7 +69,7 @@ The two browser scripts use Playwright: `npm i -D playwright && npx playwright i
 ├── public/                  Favicon, fonts for 3D text, hosting headers (pyodide/ is generated on install)
 ├── scripts/                 Pyodide copy step, browser verification scripts
 └── src/
-    ├── game/                The game: content (5 worlds × 5 stages + bosses), rules engine, store, sounds, task components
+    ├── game/                The game: content (5 worlds × 5 stages + bosses), learning cards, rules engine, store, sounds, components
     ├── i18n/                uz / ru / en dictionaries, language store, switcher
     ├── components/          UI kit (buttons, modal, fields, toasts…), layout
     ├── data/                City layout (buildings)

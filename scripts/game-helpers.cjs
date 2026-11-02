@@ -34,7 +34,9 @@ async function answerTask(page, spec, { correct = true, check = 'Check', cont = 
 /** Plays a whole stage. `wrong` lists task indexes (first attempt) to answer wrongly. */
 async function playStage(page, base, stage, { wrong = [], labels = {} } = {}) {
   await page.goto(`${base}/play/${stage.id}`);
-  await page.getByRole('button', { name: labels.start ?? 'Start', exact: true }).click();
+  // Learning cards first (info → picture → example), then the test.
+  for (let i = 1; i < stage.cards; i++) await page.getByRole('button', { name: labels.next ?? 'Next', exact: true }).click();
+  await page.getByRole('button', { name: labels.start ?? 'Start the test', exact: true }).click();
   const queue = stage.tasks.map((_, i) => i);
   const requeued = new Set();
   let mistakes = 0;

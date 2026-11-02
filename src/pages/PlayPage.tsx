@@ -1,14 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Flame, HeartCrack, Lightbulb, Lock, Map as MapIcon, Play, RotateCcw, Swords, X } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, Flame, FlaskConical, HeartCrack, Lock, Map as MapIcon, Play, RotateCcw, SkipForward, Swords, Target, X } from 'lucide-react';
 import { Button, ButtonLink } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { stageById, zoneOfStage } from '@/game/content';
-import { CodeView } from '@/game/components/CodeView';
 import { Confetti } from '@/game/components/Confetti';
 import { Hearts, Stars } from '@/game/components/Hud';
+import { LearnCardView } from '@/game/components/Learn';
 import { BugTask, ChoiceTask, isAnswerComplete, isAnswerCorrect, MatchTask, OrderTask, TaskPrompt, type Reveal, type TaskValue } from '@/game/components/Tasks';
 import { isBossUnlocked, isStageUnlocked, MAX_HEARTS, type StageResult } from '@/game/engine';
+import { learnFor } from '@/game/learn';
 import { sfx } from '@/game/sound';
 import { useGame } from '@/game/store';
 import type { Stage, Zone } from '@/game/types';
@@ -48,7 +49,16 @@ export default function PlayPage() {
       </Centered>
     );
   }
-  return <StageRun key={`${stage.id}:${run}`} stage={stage} zone={zone} index={index} onRestart={() => setRun((r) => r + 1)} />;
+  return (
+    <StageRun
+      key={`${stage.id}:${run}`}
+      stage={stage}
+      zone={zone}
+      index={index}
+      canSkipLearning={run > 0 || (game.stars[stage.id] ?? 0) > 0}
+      onRestart={() => setRun((r) => r + 1)}
+    />
+  );
 }
 
 function Centered({ children }: { children: React.ReactNode }) {
@@ -59,16 +69,20 @@ function Centered({ children }: { children: React.ReactNode }) {
   );
 }
 
-type Phase = 'tip' | 'play' | 'result' | 'failed';
+/** learn (info → picture → example cards) → play (the test) → result / failed */
+type Phase = 'learn' | 'play' | 'result' | 'failed';
 
-function StageRun({ stage, zone, index, onRestart }: { stage: Stage; zone: Zone; index: number; onRestart: () => void }) {
+function StageRun({ stage, zone, index, canSkipLearning, onRestart }: { stage: Stage; zone: Zone; index: number; canSkipLearning: boolean; onRestart: () => void }) {
   const t = useT();
   const l = useL();
   const navigate = useNavigate();
   const finishStage = useGame((s) => s.finishStage);
   const game = useGame((s) => s.game);
 
-  const [phase, setPhase] = useState<Phase>('tip');
+  const cards = useMemo(() => learnFor(stage.id), [stage.id]);
+  const [phase, setPhase] = useState<Phase>(cards.length ? 'learn' : 'play');
+  const [card, setCard] = useState(0);
+  const [reviewOpen, setReviewOpen] = useState(false);
   const [queue, setQueue] = useState<number[]>(() => stage.tasks.map((_, i) => i));
   const [requeued, setRequeued] = useState<number[]>([]);
   const [pos, setPos] = useState(0);
@@ -138,57 +152,132 @@ function StageRun({ stage, zone, index, onRestart }: { stage: Stage; zone: Zone;
     setReveal(null);
   }, [reveal, mistakes, pos, queue.length, finishStage, stage.id]);
 
-  // Keyboard: Enter checks / continues; digits are handled by the choice task.
+  const startTest = useCallback(() => {
+    sfx.tap();
+    setPhase('play');
+    window.scrollTo(0, 0);
+  }, []);
+  const goCard = useCallback(
+    (next: number) => {
+      if (next < 0) return;
+      if (next >= cards.length) {
+        startTest();
+        return;
+      }
+      setCard(next);
+      window.scrollTo(0, 0);
+    },
+    [cards.length, startTest],
+  );
+
+  // Keyboard: ← → move between cards; Enter continues / checks; digits are handled by the choice task.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Enter' || confirmQuit) return;
+      if (confirmQuit || reviewOpen || e.ctrlKey || e.metaKey || e.altKey) return;
       const target = e.target as HTMLElement;
-      if (target.tagName === 'BUTTON' && phase !== 'play') return;
-      if (phase === 'tip') {
-        e.preventDefault();
-        setPhase('play');
-      } else if (phase === 'play') {
-        e.preventDefault();
-        if (reveal) proceed();
-        else check();
+      if (phase === 'learn') {
+        if (e.key === 'ArrowRight' || (e.key === 'Enter' && target.tagName !== 'BUTTON' && target.tagName !== 'A')) {
+          e.preventDefault();
+          goCard(card + 1);
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          goCard(card - 1);
+        }
+        return;
       }
+      if (e.key !== 'Enter' || phase !== 'play') return;
+      e.preventDefault();
+      if (reveal) proceed();
+      else check();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, reveal, proceed, check, confirmQuit]);
+  }, [phase, reveal, proceed, check, confirmQuit, reviewOpen, card, goCard]);
 
   const nextStage = zone.stages[index + 1];
   const quit = () => navigate(`/zone/${zone.id}`);
 
-  if (phase === 'tip') {
+  if (phase === 'learn') {
+    const current = cards[card];
+    const last = card === cards.length - 1;
     return (
-      <main id="main" className="mx-auto flex min-h-[100dvh] max-w-2xl flex-col justify-center px-4 py-10">
-        <div className="glass-strong animate-pop-in rounded-3xl p-6 sm:p-8">
-          <div className="flex items-center justify-between gap-3">
-            <span className="grid h-12 w-12 place-items-center rounded-2xl border-2 font-mono text-sm font-bold" style={{ borderColor: zone.accent, color: zone.accent }}>
-              {zone.symbol}
-            </span>
-            <Link to={`/zone/${zone.id}`} className="focus-ring rounded-lg p-2 text-slate-400 hover:text-white" aria-label={t('common.back')}>
+      <div className="flex min-h-[100dvh] flex-col">
+        <header className="sticky top-0 z-20 border-b border-white/[0.06] bg-night-950/90 backdrop-blur">
+          <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
+            <Link to={`/zone/${zone.id}`} className="focus-ring rounded-lg p-2 text-slate-400 hover:bg-white/10 hover:text-white" aria-label={t('common.back')}>
               <X className="h-5 w-5" />
             </Link>
+            <ol className="flex flex-1 items-center gap-1.5" aria-label={t('learn.progress', { n: card + 1, total: cards.length })}>
+              {cards.map((c, i) => (
+                <li key={i} className="flex-1">
+                  <button
+                    type="button"
+                    onClick={() => goCard(i)}
+                    aria-label={l(c.title)}
+                    aria-current={i === card ? 'step' : undefined}
+                    className={cn('focus-ring block h-2.5 w-full rounded-full transition-colors', i < card ? 'bg-sky-400' : i === card ? 'bg-sky-300' : 'bg-white/10 hover:bg-white/20')}
+                  />
+                </li>
+              ))}
+              <li className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/[0.06] text-slate-400" title={t('learn.test')}>
+                <Target className="h-4 w-4" aria-hidden />
+              </li>
+            </ol>
+            {canSkipLearning && (
+              <button type="button" onClick={startTest} className="focus-ring hidden items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-slate-400 hover:bg-white/10 hover:text-white sm:flex">
+                <SkipForward className="h-4 w-4" aria-hidden /> {t('learn.skip')}
+              </button>
+            )}
           </div>
-          <p className="mt-5 text-sm font-semibold uppercase tracking-widest" style={{ color: zone.accent }}>
-            {t('zone.stage', { n: index + 1 })}
-          </p>
-          <h1 className="mt-1 text-3xl font-bold">{l(stage.title)}</h1>
-          <div className="mt-5 flex gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] p-4">
-            <Lightbulb className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" aria-hidden />
-            <p className="text-[15px] leading-relaxed text-amber-50">{l(stage.tip.text)}</p>
+        </header>
+
+        <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 pb-40 pt-6">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: zone.accent }}>
+                {t('zone.stage', { n: index + 1 })} · {t('learn.progress', { n: card + 1, total: cards.length })}
+              </p>
+              <h1 className="mt-0.5 text-lg font-bold text-slate-300">{l(stage.title)}</h1>
+            </div>
+            <ol className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider" aria-hidden>
+              <li className="flex items-center gap-1 rounded-full bg-sky-400/15 px-2.5 py-1 text-sky-200">
+                <BookOpen className="h-3.5 w-3.5" /> {t('learn.info')}
+              </li>
+              <ChevronRight className="h-3.5 w-3.5 text-slate-600" />
+              <li className="flex items-center gap-1 rounded-full bg-amber-400/15 px-2.5 py-1 text-amber-200">
+                <FlaskConical className="h-3.5 w-3.5" /> {t('learn.example')}
+              </li>
+              <ChevronRight className="h-3.5 w-3.5 text-slate-600" />
+              <li className="flex items-center gap-1 rounded-full bg-white/[0.05] px-2.5 py-1 text-slate-500">
+                <Target className="h-3.5 w-3.5" /> {t('learn.test')}
+              </li>
+            </ol>
           </div>
-          <CodeView code={stage.tip.code} lang={stage.tip.lang} className="mt-4" />
-          <div className="mt-6 flex items-center justify-between gap-3">
-            <Hearts hearts={MAX_HEARTS} />
-            <Button size="lg" onClick={() => setPhase('play')} icon={<Play className="h-5 w-5" />} autoFocus>
-              {t('common.start')}
+          <div key={card} className="animate-rise-in">
+            <LearnCardView card={current} accent={zone.accent} />
+          </div>
+        </main>
+
+        <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-white/[0.06] bg-night-950/95 px-4 py-4 safe-bottom">
+          <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
+            <Button variant="secondary" size="lg" onClick={() => goCard(card - 1)} disabled={card === 0} icon={<ChevronLeft className="h-5 w-5" />}>
+              <span className="hidden sm:inline">{t('common.back')}</span>
             </Button>
+            {last ? (
+              <div className="flex items-center gap-3">
+                <span className="hidden text-sm text-slate-400 sm:inline">{t('learn.ready', { n: stage.tasks.length })}</span>
+                <Button size="lg" onClick={startTest} icon={<Target className="h-5 w-5" />} className="min-w-[180px]">
+                  {t('learn.start')}
+                </Button>
+              </div>
+            ) : (
+              <Button size="lg" onClick={() => goCard(card + 1)} className="min-w-[160px]">
+                {t('learn.next')} <ChevronRight className="h-5 w-5" aria-hidden />
+              </Button>
+            )}
           </div>
-        </div>
-      </main>
+        </footer>
+      </div>
     );
   }
 
@@ -267,6 +356,18 @@ function StageRun({ stage, zone, index, onRestart }: { stage: Stage; zone: Zone;
           >
             <div className="h-full rounded-full bg-gradient-to-r from-emerald-300 to-cyan-300 transition-[width] duration-500" style={{ width: `${Math.max(4, progress * 100)}%` }} />
           </div>
+          {cards.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setReviewOpen(true)}
+              className="focus-ring flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-semibold text-sky-300 hover:bg-white/10"
+              aria-label={t('learn.review')}
+              title={t('learn.review')}
+            >
+              <BookOpen className="h-5 w-5" aria-hidden />
+              <span className="hidden sm:inline">{t('learn.review')}</span>
+            </button>
+          )}
           <Hearts hearts={hearts} />
         </div>
       </header>
@@ -323,6 +424,14 @@ function StageRun({ stage, zone, index, onRestart }: { stage: Stage; zone: Zone;
           )}
         </div>
       </footer>
+
+      <Modal open={reviewOpen} onClose={() => setReviewOpen(false)} title={`📖 ${t('learn.review')}: ${l(stage.title)}`} size="lg">
+        <div className="space-y-10">
+          {cards.map((c, i) => (
+            <LearnCardView key={i} card={c} accent={zone.accent} compact />
+          ))}
+        </div>
+      </Modal>
 
       <Modal
         open={confirmQuit}

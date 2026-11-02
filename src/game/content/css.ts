@@ -16,15 +16,6 @@ export const cssZone: Zone = {
       id: 'css-1',
       zoneId: 'css',
       title: tx('Selektorlar va ranglar', 'Селекторы и цвета', 'Selectors & colors'),
-      tip: {
-        text: tx(
-          'Selektor nimani bezashni aytadi: .klass, #id yoki teg nomi.',
-          'Селектор говорит, что стилизовать: .класс, #id или имя тега.',
-          'A selector says what to style: .class, #id or a tag name.',
-        ),
-        code: '.title {\n  color: tomato;\n}',
-        lang: 'css',
-      },
       tasks: [
         { kind: 'pick', q: tx('Klass selektori', 'Селектор класса', 'A class selector'), options: ['.card', '#card', 'card', '*card'], answer: 0 },
         { kind: 'pick', q: tx('ID selektori', 'Селектор id', 'An id selector'), options: ['#logo', '.logo', 'logo', '@logo'], answer: 0 },
@@ -38,15 +29,6 @@ export const cssZone: Zone = {
       id: 'css-2',
       zoneId: 'css',
       title: tx('Quti modeli', 'Блочная модель', 'The box model'),
-      tip: {
-        text: tx(
-          'padding — ichki boʻshliq, border — chegara, margin — tashqi boʻshliq.',
-          'padding — внутренний отступ, border — рамка, margin — внешний отступ.',
-          'padding is inner space, border is the edge, margin is outer space.',
-        ),
-        code: '.card {\n  padding: 16px;\n  border: 2px solid;\n  margin: 8px;\n}',
-        lang: 'css',
-      },
       tasks: [
         { kind: 'pick', q: tx('Ichki boʻshliq', 'Внутренний отступ', 'Inner spacing'), options: ['padding', 'margin', 'border', 'gap'], answer: 0 },
         { kind: 'pick', q: tx('Tashqi boʻshliq', 'Внешний отступ', 'Outer spacing'), options: ['margin', 'padding', 'outline', 'space'], answer: 0 },
@@ -60,15 +42,6 @@ export const cssZone: Zone = {
       id: 'css-3',
       zoneId: 'css',
       title: tx('Matn uslubi', 'Типографика', 'Typography'),
-      tip: {
-        text: tx(
-          'font-size — oʻlcham, font-weight — qalinlik, text-align — tekislash.',
-          'font-size — размер, font-weight — жирность, text-align — выравнивание.',
-          'font-size sets the size, font-weight the boldness, text-align the alignment.',
-        ),
-        code: 'h1 {\n  font-size: 2rem;\n  font-weight: 700;\n  text-align: center;\n}',
-        lang: 'css',
-      },
       tasks: [
         { kind: 'pick', q: tx('Matn oʻlchami', 'Размер текста', 'Text size'), options: ['font-size', 'text-size', 'font-weight', 'size'], answer: 0 },
         { kind: 'pick', q: tx('Qalin matn', 'Жирный текст', 'Bold text'), options: ['font-weight: bold', 'font-style: bold', 'text: bold', 'bold: true'], answer: 0 },
@@ -82,15 +55,6 @@ export const cssZone: Zone = {
       id: 'css-4',
       zoneId: 'css',
       title: tx('Flexbox', 'Flexbox', 'Flexbox'),
-      tip: {
-        text: tx(
-          'display: flex elementlarni qatorga teradi; justify-content — gorizontal, align-items — vertikal joylashuv.',
-          'display: flex выстраивает элементы в ряд; justify-content — по горизонтали, align-items — по вертикали.',
-          'display: flex lines items up in a row; justify-content places them horizontally, align-items vertically.',
-        ),
-        code: '.nav {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}',
-        lang: 'css',
-      },
       tasks: [
         { kind: 'pick', q: tx('Flex konteyner yaratish', 'Создать flex-контейнер', 'Make a flex container'), options: ['display: flex', 'flex: on', 'display: row', 'position: flex'], answer: 0 },
         { kind: 'pick', q: tx('Elementlar orasidagi masofa', 'Расстояние между элементами', 'Space between items'), options: ['gap', 'space', 'between', 'padding'], answer: 0 },
@@ -110,15 +74,6 @@ export const cssZone: Zone = {
       id: 'css-5',
       zoneId: 'css',
       title: tx('Grid va moslashuvchanlik', 'Grid и адаптивность', 'Grid & responsive'),
-      tip: {
-        text: tx(
-          'display: grid ustunlar yaratadi; @media ekran kengligiga qarab uslubni oʻzgartiradi.',
-          'display: grid создаёт колонки; @media меняет стили в зависимости от ширины экрана.',
-          'display: grid creates columns; @media changes styles depending on the screen width.',
-        ),
-        code: '.grid {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n}\n@media (max-width: 600px) {\n  .grid { grid-template-columns: 1fr; }\n}',
-        lang: 'css',
-      },
       tasks: [
         { kind: 'pick', q: tx('Grid konteyner', 'Grid-контейнер', 'A grid container'), options: ['display: grid', 'grid: on', 'display: table', 'layout: grid'], answer: 0 },
         { kind: 'pick', q: tx('Ekran kengligiga qarab uslub', 'Стили по ширине экрана', 'Styles by screen width'), options: ['@media', '@screen', '@width', '@responsive'], answer: 0 },
