@@ -93,6 +93,23 @@ const xpOf = async (page) => {
     await page.goto(`${BASE}/dashboard`);
     ok(await page.waitForURL(/\/map$/, { timeout: 10000 }).then(() => true).catch(() => false), 'old /dashboard link redirects to the map');
     if (label === 'mobile') {
+      await page.goto(`${BASE}/settings`);
+      await page.getByRole('switch').first().waitFor();
+      const knobs = async () =>
+        page.$$eval('[role="switch"]', (els) =>
+          els.map((el) => {
+            const t = el.getBoundingClientRect();
+            const k = el.firstElementChild.getBoundingClientRect();
+            const on = el.getAttribute('aria-checked') === 'true';
+            return k.left >= t.left && k.right <= t.right && (on ? k.left > t.left + t.width / 2 - k.width / 2 : k.right < t.left + t.width / 2 + k.width / 2);
+          }),
+        );
+      const before = await knobs();
+      await page.getByRole('switch').first().click();
+      await page.waitForTimeout(400); // let the slide animation finish
+      const after = await knobs();
+      await page.getByRole('switch').first().click();
+      ok([...before, ...after].every(Boolean), `switch knobs stay inside their tracks, left when off and right when on (${JSON.stringify([before, after])})`);
       await page.goto(`${BASE}/map`);
       await page.getByRole('button', { name: 'Menyuni ochish' }).click();
       ok(await visible(page.locator('#mobile-nav')), 'mobile navigation menu opens');

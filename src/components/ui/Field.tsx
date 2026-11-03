@@ -119,7 +119,9 @@ export function Switch({
         )}
       >
         <span
-          className={cn('absolute top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform', checked ? 'translate-x-[22px]' : 'translate-x-0.5')}
+          // Explicit left/top: inside a <button> the default position of an absolute child is
+          // browser-dependent (mobile browsers centre it), which pushed the knob out of the track.
+          className={cn('absolute left-0.5 top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform', checked ? 'translate-x-5' : 'translate-x-0')}
         />
       </button>
     </div>
