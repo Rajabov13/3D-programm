@@ -58,5 +58,8 @@ export const router = createBrowserRouter(
       ],
     },
   ],
-  { future: { v7_relativeSplatPath: true, v7_fetcherPersist: true, v7_normalizeFormMethod: true, v7_partialHydration: true, v7_skipActionErrorRevalidation: true } },
+  {
+    // Works both at the domain root and in a sub-folder (GitHub Pages: /3d-programm/).
+    basename: import.meta.env.BASE_URL.replace(/\/$/, '') || '/',
+    future: { v7_relativeSplatPath: true, v7_fetcherPersist: true, v7_normalizeFormMethod: true, v7_partialHydration: true, v7_skipActionErrorRevalidation: true } },
 );

@@ -10,5 +10,5 @@ const runner = (env.VITE_PYTHON_RUNNER ?? 'pyodide').trim();
 export const config = {
   pythonRunner: (runner === 'disabled' ? 'disabled' : 'pyodide') as PythonRunnerKind,
   /** Absolute or root-relative URL of the Pyodide distribution (trailing slash). */
-  pyodideBaseUrl: ((env.VITE_PYODIDE_BASE_URL ?? '').trim() || '/pyodide/v0.26.4/').replace(/\/?$/, '/'),
+  pyodideBaseUrl: ((env.VITE_PYODIDE_BASE_URL ?? '').trim() || `${env.BASE_URL}pyodide/v0.26.4/`).replace(/\/?$/, '/'),
 } as const;

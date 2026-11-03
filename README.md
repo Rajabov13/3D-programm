@@ -88,10 +88,18 @@ More detail: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**. Manual QA: **[doc
 
 ## Deploying
 
-`npm run build` produces a static site in `dist/`; any static host works with an SPA fallback
-to `index.html`. One requirement: **`/pyodide/*` must be served with
-`Access-Control-Allow-Origin: *`**, because the Python sandbox runs in an opaque-origin iframe.
-`public/_headers` (Netlify / Cloudflare Pages) and `vercel.json` already do this.
+**Live demo:** https://rajabov13.github.io/3d-programm/
+
+**GitHub Pages (already set up).** Every push to `main` runs `.github/workflows/pages.yml`: it builds the site
+with `BASE_PATH=/<repo>/`, adds `404.html` (so deep links like `/3d-programm/map` work) and `.nojekyll`, and
+publishes `dist/` to the `gh-pages` branch. In the repository settings, **Pages → Build and deployment →
+Source: Deploy from a branch → `gh-pages` / root** must be selected once.
+
+**Any other static host.** `npm run build` produces a static site in `dist/`; serve it with an SPA fallback to
+`index.html`. To host in a sub-folder, build with `BASE_PATH=/folder/ npm run build`. One requirement:
+**`/pyodide/*` must be served with `Access-Control-Allow-Origin: *`**, because the Python sandbox runs in an
+opaque-origin iframe. GitHub Pages sends this header for every file; `public/_headers` (Netlify / Cloudflare
+Pages) and `vercel.json` set it for those hosts.
 
 ## Limitations of the demo version
 

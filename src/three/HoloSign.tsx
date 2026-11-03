@@ -4,8 +4,8 @@ import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { useBackingMaterial, useGlowMaterial, useSignTextMaterial } from './materials';
 
-export const FONT_URL = '/fonts/inter-600.woff';
-export const MONO_FONT_URL = '/fonts/jetbrains-mono-500.woff';
+export const FONT_URL = `${import.meta.env.BASE_URL}fonts/inter-600.woff`;
+export const MONO_FONT_URL = `${import.meta.env.BASE_URL}fonts/jetbrains-mono-500.woff`;
 
 /** Floating holographic name plate in front of a building. */
 export function HoloSign({

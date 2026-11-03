@@ -9,7 +9,7 @@ import { fileURLToPath, URL } from 'node:url';
  */
 function pyodideCors(): Plugin {
   const middleware = (req: { url?: string }, res: { setHeader(name: string, value: string): void }, next: () => void) => {
-    if (req.url?.startsWith('/pyodide/')) res.setHeader('Access-Control-Allow-Origin', '*');
+    if (req.url?.includes('/pyodide/')) res.setHeader('Access-Control-Allow-Origin', '*');
     next();
   };
   return {
@@ -25,6 +25,8 @@ function pyodideCors(): Plugin {
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Sub-path for hosting in a folder, e.g. BASE_PATH=/3d-programm/ for GitHub Pages.
+  base: process.env.BASE_PATH || '/',
   plugins: [react(), pyodideCors()],
   resolve: {
     alias: {
