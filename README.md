@@ -88,10 +88,10 @@ More detail: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**. Manual QA: **[doc
 
 ## Deploying
 
-**Live demo:** https://rajabov13.github.io/3d-programm/
+**Live demo:** https://rajabov13.github.io/3D-programm/
 
 **GitHub Pages (already set up).** Every push to `main` runs `.github/workflows/pages.yml`: it builds the site
-with `BASE_PATH=/<repo>/`, adds `404.html` (so deep links like `/3d-programm/map` work) and `.nojekyll`, and
+with `BASE_PATH=/<repo>/`, adds `404.html` (so deep links like `/3D-programm/map` work) and `.nojekyll`, and
 publishes `dist/` to the `gh-pages` branch. In the repository settings, **Pages → Build and deployment →
 Source: Deploy from a branch → `gh-pages` / root** must be selected once.
 
