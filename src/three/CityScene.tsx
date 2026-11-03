@@ -2,7 +2,7 @@ import { useCallback, useEffect, type MutableRefObject } from 'react';
 import * as THREE from 'three';
 import { buildings } from '@/data/buildings';
 import type { BuildingId } from '@/data/buildings';
-import { FOG_COLOR, Lighting, Sky, Stars } from './Atmosphere';
+import { Lighting, Sky, Stars } from './Atmosphere';
 import { Building, type BuildingStatus } from './buildings/Building';
 import { Drones } from './Drones';
 import { FloatingSymbols } from './FloatingSymbols';
@@ -10,6 +10,7 @@ import { Ground, ShadowCatcher } from './Ground';
 import { CityMaterialsProvider } from './materials';
 import { PlazaCore } from './PlazaCore';
 import type { QualityPreset } from './quality';
+import { useScenePalette } from './scenePalette';
 import { Skyline } from './Skyline';
 import { useWorld } from './worldStore';
 
@@ -36,6 +37,8 @@ export function CityScene({ preset, animate, interactive, statusById, targets, o
   const hover = useWorld((s) => s.hover);
   const select = useWorld((s) => s.select);
   const mode = useWorld((s) => s.mode);
+  // Day in the light site theme, night in the dark one.
+  const palette = useScenePalette();
 
   useEffect(() => {
     if (!interactive) return;
@@ -59,15 +62,15 @@ export function CityScene({ preset, animate, interactive, statusById, targets, o
   const fogFar = 260;
 
   return (
-    <CityMaterialsProvider preset={preset}>
-      <color attach="background" args={[FOG_COLOR]} />
-      <fog attach="fog" args={[FOG_COLOR, fogNear, fogFar]} />
-      <Sky />
-      <Stars count={preset.starCount} />
-      <Lighting preset={preset} />
-      <Ground fogColor={FOG_COLOR} fogNear={fogNear} fogFar={fogFar} animate={animate} />
+    <CityMaterialsProvider preset={preset} palette={palette}>
+      <color attach="background" args={[palette.background]} />
+      <fog attach="fog" args={[palette.background, fogNear, fogFar]} />
+      <Sky palette={palette} />
+      {palette.stars && <Stars count={preset.starCount} />}
+      <Lighting preset={preset} palette={palette} />
+      <Ground fogColor={palette.background} fogNear={fogNear} fogFar={fogFar} animate={animate} palette={palette} />
       {preset.shadows && <ShadowCatcher />}
-      <Skyline count={preset.skylineCount} castShadow={false} />
+      <Skyline count={preset.skylineCount} castShadow={false} palette={palette} />
       <PlazaCore animate={animate} shadows={preset.shadows} />
       {buildings.map((def) => (
         <Building

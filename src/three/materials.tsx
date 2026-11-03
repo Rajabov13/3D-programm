@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'r
 import * as THREE from 'three';
 import { createWindowTexture } from './textures';
 import type { QualityPreset } from './quality';
+import type { ScenePalette } from './scenePalette';
 
 export interface CityMaterials {
   facade: THREE.MeshStandardMaterial;
@@ -15,13 +16,13 @@ export interface CityMaterials {
 
 const MaterialsContext = createContext<CityMaterials | null>(null);
 
-function makeFacade(texture: THREE.Texture, preset: QualityPreset, tint: string) {
+function makeFacade(texture: THREE.Texture, preset: QualityPreset, tint: string, emissive: number) {
   const params = {
     color: new THREE.Color(tint),
     map: texture,
     emissive: new THREE.Color('#ffffff'),
     emissiveMap: texture,
-    emissiveIntensity: 1.25,
+    emissiveIntensity: emissive,
     metalness: 0.55,
     roughness: 0.32,
     envMapIntensity: 0.9,
@@ -30,36 +31,36 @@ function makeFacade(texture: THREE.Texture, preset: QualityPreset, tint: string)
 }
 
 /** Shared materials for the whole city — created once per quality preset and disposed on change/unmount. */
-export function CityMaterialsProvider({ preset, children }: { preset: QualityPreset; children: ReactNode }) {
+export function CityMaterialsProvider({ preset, palette, children }: { preset: QualityPreset; palette: ScenePalette; children: ReactNode }) {
   const materials = useMemo<CityMaterials>(() => {
-    const facadeTex = createWindowTexture(11);
+    const facadeTex = createWindowTexture(11, 8, 32, palette.windows);
     facadeTex.repeat.set(2, 2);
-    const facadeAltTex = createWindowTexture(23, 6, 24);
+    const facadeAltTex = createWindowTexture(23, 6, 24, palette.windows);
     facadeAltTex.repeat.set(2, 1.5);
-    const skylineTex = createWindowTexture(5, 6, 30);
+    const skylineTex = createWindowTexture(5, 6, 30, palette.windows);
     skylineTex.repeat.set(1, 1);
-    const glassParams = { color: new THREE.Color('#14243c'), metalness: 0.95, roughness: 0.08, envMapIntensity: 1.4, transparent: true, opacity: 0.9 };
+    const glassParams = { color: new THREE.Color(palette.glass), metalness: 0.95, roughness: 0.08, envMapIntensity: 1.4, transparent: true, opacity: 0.9 };
     const glass = preset.physicalMaterials
       ? new THREE.MeshPhysicalMaterial({ ...glassParams, clearcoat: 1, clearcoatRoughness: 0.05 })
       : new THREE.MeshStandardMaterial(glassParams);
     return {
-      facade: makeFacade(facadeTex, preset, '#c9d6ea'),
-      facadeAlt: makeFacade(facadeAltTex, preset, '#b9c5f0'),
+      facade: makeFacade(facadeTex, preset, palette.facade.tint, palette.facade.emissive),
+      facadeAlt: makeFacade(facadeAltTex, preset, palette.facade.altTint, palette.facade.emissive),
       glass,
-      metal: new THREE.MeshStandardMaterial({ color: '#46536b', metalness: 0.7, roughness: 0.38, envMapIntensity: 1.1 }),
-      dark: new THREE.MeshStandardMaterial({ color: '#0b1220', metalness: 0.6, roughness: 0.55 }),
+      metal: new THREE.MeshStandardMaterial({ color: palette.metal, metalness: 0.7, roughness: 0.38, envMapIntensity: 1.1 }),
+      dark: new THREE.MeshStandardMaterial({ color: palette.dark, metalness: 0.6, roughness: 0.55 }),
       skyline: new THREE.MeshStandardMaterial({
-        color: '#7d8aa6',
+        color: palette.day ? '#ffffff' : '#7d8aa6',
         map: skylineTex,
         emissive: new THREE.Color('#ffffff'),
         emissiveMap: skylineTex,
-        emissiveIntensity: 0.6,
+        emissiveIntensity: palette.skyline.emissive,
         metalness: 0.4,
         roughness: 0.5,
       }),
       textures: [facadeTex, facadeAltTex, skylineTex],
     };
-  }, [preset]);
+  }, [preset, palette]);
 
   useEffect(
     () => () => {

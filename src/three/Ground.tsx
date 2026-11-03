@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { PLAZA_RADIUS } from '@/data/buildings';
+import type { ScenePalette } from './scenePalette';
 
 const vertex = /* glsl */ `
   varying vec3 vWorld;
@@ -19,6 +20,7 @@ const fragment = /* glsl */ `
   uniform vec3 uLine;
   uniform vec3 uAccent;
   uniform vec3 uRoad;
+  uniform vec3 uDash;
   uniform float uTime;
   uniform float uPlaza;
   uniform vec3 uFogColor;
@@ -40,7 +42,7 @@ const fragment = /* glsl */ `
     float fine = gridLine(p, 2.0, 1.0) * 0.18;
     float coarse = gridLine(p, 10.0, 1.4) * 0.45;
     float gridFade = smoothstep(150.0, 30.0, r);
-    col += uLine * (fine + coarse) * gridFade;
+    col = mix(col, uLine, clamp((fine + coarse) * gridFade, 0.0, 1.0));
 
     // Plaza disc with concentric rings.
     float plaza = 1.0 - smoothstep(uPlaza - 0.2, uPlaza + 0.2, r);
@@ -48,7 +50,7 @@ const fragment = /* glsl */ `
     float ring1 = 1.0 - smoothstep(0.0, 0.12, abs(r - uPlaza));
     float ring2 = 1.0 - smoothstep(0.0, 0.07, abs(r - uPlaza * 0.62));
     float pulse = 0.6 + 0.4 * sin(uTime * 1.2 - r * 0.4);
-    col += uAccent * (ring1 * 1.3 + ring2 * 0.7 * pulse);
+    col = mix(col, uAccent, clamp(ring1 * 1.3 + ring2 * 0.7 * pulse, 0.0, 1.0));
 
     // Roads: ring road + 8 avenues (angles measured from north, every 45 deg).
     float ringRoad = 1.0 - smoothstep(2.2, 2.5, abs(r - 22.0));
@@ -59,9 +61,9 @@ const fragment = /* glsl */ `
     float road = max(ringRoad, avenue);
     col = mix(col, uRoad, road * 0.92);
     float edge = (1.0 - smoothstep(0.0, 0.08, abs(dist - 1.95))) * avenue + (1.0 - smoothstep(0.0, 0.08, abs(abs(r - 22.0) - 2.35)));
-    col += uAccent * edge * 0.55;
+    col = mix(col, uAccent, clamp(edge * 0.55, 0.0, 1.0));
     float dash = (1.0 - smoothstep(0.03, 0.08, dist)) * step(0.5, fract(r / 3.0)) * avenue;
-    col += vec3(0.55, 0.62, 0.7) * dash * 0.35;
+    col = mix(col, uDash, dash * 0.35);
 
     float fogFactor = smoothstep(uFogNear, uFogFar, length(vWorld - cameraPosition));
     gl_FragColor = vec4(mix(col, uFogColor, fogFactor), 1.0);
@@ -69,17 +71,18 @@ const fragment = /* glsl */ `
   }
 `;
 
-export function Ground({ fogColor, fogNear, fogFar, animate }: { fogColor: string; fogNear: number; fogFar: number; animate: boolean }) {
+export function Ground({ fogColor, fogNear, fogFar, animate, palette }: { fogColor: string; fogNear: number; fogFar: number; animate: boolean; palette: ScenePalette }) {
   const material = useMemo(
     () =>
       new THREE.ShaderMaterial({
         vertexShader: vertex,
         fragmentShader: fragment,
         uniforms: {
-          uBase: { value: new THREE.Color('#05090f') },
-          uLine: { value: new THREE.Color('#2b6cb0') },
-          uAccent: { value: new THREE.Color('#38d6ff') },
-          uRoad: { value: new THREE.Color('#080c14') },
+          uBase: { value: new THREE.Color(palette.ground.base) },
+          uLine: { value: new THREE.Color(palette.ground.line) },
+          uAccent: { value: new THREE.Color(palette.ground.accent) },
+          uRoad: { value: new THREE.Color(palette.ground.road) },
+          uDash: { value: new THREE.Color(palette.ground.dash) },
           uTime: { value: 0 },
           uPlaza: { value: PLAZA_RADIUS },
           uFogColor: { value: new THREE.Color(fogColor) },
@@ -87,7 +90,7 @@ export function Ground({ fogColor, fogNear, fogFar, animate }: { fogColor: strin
           uFogFar: { value: fogFar },
         },
       }),
-    [fogColor, fogNear, fogFar],
+    [fogColor, fogNear, fogFar, palette],
   );
   useEffect(() => () => material.dispose(), [material]);
   useFrame((_, dt) => {

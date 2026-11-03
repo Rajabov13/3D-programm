@@ -23,18 +23,18 @@ function SkylinePoster() {
   ];
   return (
     <div className="absolute inset-0 overflow-hidden" aria-hidden>
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgba(56,189,248,0.18),transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgb(var(--c-sky-400)/0.18),transparent_60%)]" />
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute bottom-0 h-[55%] w-full opacity-70">
         <defs>
           <linearGradient id="tower" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#1e3a5f" />
-            <stop offset="1" stopColor="#060b16" />
+            <stop offset="0" style={{ stopColor: 'rgb(var(--c-slate-700))' }} />
+            <stop offset="1" style={{ stopColor: 'rgb(var(--c-night-950))' }} />
           </linearGradient>
         </defs>
         {towers.map(([x, h]) => (
           <g key={x}>
             <rect x={x - 2.4} y={100 - h} width={4.8} height={h} fill="url(#tower)" />
-            <rect x={x - 2.4} y={100 - h} width={4.8} height={0.4} fill="#5ce1ff" opacity="0.6" />
+            <rect x={x - 2.4} y={100 - h} width={4.8} height={0.4} fill="#3b82f6" opacity="0.6" />
           </g>
         ))}
       </svg>
@@ -72,7 +72,9 @@ function HeroBackground() {
         </ErrorBoundary>
       )}
       <div className="absolute inset-0 bg-gradient-to-b from-night-950/70 via-night-950/20 to-night-950" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(3,6,13,0.75)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgb(var(--c-night-950)/0.7)_100%)]" />
+      {/* Keeps the headline readable over the city in both themes. */}
+      <div className="absolute inset-0 bg-gradient-to-r from-night-950/85 via-night-950/35 to-transparent" />
     </div>
   );
 }
@@ -88,12 +90,12 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen">
-      <div data-theme="dark" className="absolute inset-x-0 top-0 z-40">
+      <div className="absolute inset-x-0 top-0 z-40">
         <Navbar transparent />
       </div>
 
-      {/* The hero sits on the night-time 3D city, so it always uses the dark palette. */}
-      <section data-theme="dark" className="relative isolate flex min-h-[100svh] items-center overflow-hidden bg-night-950" aria-labelledby="hero-title">
+      {/* The 3D city behind the hero is shown by day in the light theme and by night in the dark one. */}
+      <section className="relative isolate flex min-h-[100svh] items-center overflow-hidden bg-night-950" aria-labelledby="hero-title">
         <HeroBackground />
         <div id="main" className="relative mx-auto w-full max-w-6xl px-4 pb-20 pt-28 sm:px-6">
           <div className="max-w-2xl">

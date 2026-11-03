@@ -2,9 +2,10 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { seededRandom } from '@/lib/random';
 import { useCityMaterials } from './materials';
+import type { ScenePalette } from './scenePalette';
 
 /** Background towers rendered as a single InstancedMesh (one draw call). */
-export function Skyline({ count, castShadow }: { count: number; castShadow: boolean }) {
+export function Skyline({ count, castShadow, palette }: { count: number; castShadow: boolean; palette: ScenePalette }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   const { skyline } = useCityMaterials();
   const geometry = useMemo(() => {
@@ -42,14 +43,16 @@ export function Skyline({ count, castShadow }: { count: number; castShadow: bool
       q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), t.rot);
       m.compose(new THREE.Vector3(t.x, 0, t.z), q, new THREE.Vector3(t.w, t.h, t.d));
       mesh.setMatrixAt(i, m);
-      color.setRGB(0.7 * t.tint, 0.8 * t.tint, 1 * t.tint);
+      const [r, g, b] = palette.skyline.tint;
+      const lift = palette.skyline.lift;
+      color.setRGB(lift + r * t.tint, lift + g * t.tint, lift + b * t.tint);
       mesh.setColorAt(i, color);
     });
     mesh.count = transforms.length;
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     mesh.computeBoundingSphere();
-  }, [transforms]);
+  }, [transforms, palette]);
 
   useLayoutEffect(() => () => geometry.dispose(), [geometry]);
 

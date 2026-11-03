@@ -294,7 +294,7 @@ const xpOf = async (page) => {
     await page.getByRole('radio', { name: /Yorugʻ/ }).click();
     ok((await themeOf()) === 'light', 'Settings → Koʻrinish → Yorugʻ switches back');
     await page.goto(`${BASE}/world`);
-    ok((await page.locator('#main[data-theme="dark"]').count()) === 1, 'the 3D city keeps its night (dark) look in the light theme');
+    ok((await page.locator('[data-theme="dark"]').count()) === 0 && (await themeOf()) === 'light', 'the 3D city follows the theme (day scene in the light theme)');
 
     // Every visible text must be readable (WCAG AA: 4.5:1, or 3:1 for large text) in both themes.
     const audit = () => {

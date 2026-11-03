@@ -188,7 +188,7 @@ export default function WorldPage() {
   const statusKey = useMemo(() => JSON.stringify(statusById), [statusById]);
 
   return (
-    <div ref={containerRef} data-theme="dark" className="fixed inset-0 overflow-hidden bg-night-950" id="main">
+    <div ref={containerRef} className="fixed inset-0 overflow-hidden bg-night-950" id="main">
       <h1 className="sr-only">{t('world.title')}</h1>
 
       {/* Scene */}
