@@ -1,9 +1,18 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { useT } from '@/i18n';
+import { isChunkLoadError } from '@/lib/chunks';
 import { ErrorState } from './ui/Feedback';
 
 function CrashState({ error, onRetry }: { error: Error; onRetry: () => void }) {
   const t = useT();
+  // A stale page after a new deployment: retrying can't help, a reload fetches the new version.
+  if (isChunkLoadError(error)) {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-16">
+        <ErrorState title={t('common.updated')} error={t('common.updatedHint')} onRetry={() => window.location.reload()} retryLabel={t('common.reload')} />
+      </div>
+    );
+  }
   return (
     <div className="mx-auto max-w-xl px-4 py-16">
       <ErrorState title={t('common.crashed')} error={error} onRetry={onRetry} />

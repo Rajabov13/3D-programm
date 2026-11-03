@@ -56,7 +56,7 @@ export function EmptyState({
   );
 }
 
-export function ErrorState({ error, title, onRetry, className }: { error?: unknown; title?: string; onRetry?: () => void; className?: string }) {
+export function ErrorState({ error, title, onRetry, retryLabel, className }: { error?: unknown; title?: string; onRetry?: () => void; retryLabel?: string; className?: string }) {
   const t = useT();
   return (
     <div role="alert" className={cn('flex flex-col items-center rounded-2xl border border-rose-400/20 bg-rose-500/[0.06] px-6 py-10 text-center', className)}>
@@ -65,7 +65,7 @@ export function ErrorState({ error, title, onRetry, className }: { error?: unkno
       {error !== undefined && <p className="mt-1.5 max-w-lg text-sm text-rose-100/80">{errorMessage(error)}</p>}
       {onRetry && (
         <Button variant="secondary" size="sm" className="mt-5" onClick={onRetry} icon={<RefreshCw className="h-3.5 w-3.5" />}>
-          {t('common.retry')}
+          {retryLabel ?? t('common.retry')}
         </Button>
       )}
     </div>

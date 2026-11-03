@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Building2, Gamepad2, Play, Swords, Trophy } from 'lucide-react';
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
@@ -7,12 +7,13 @@ import { ZONES } from '@/game/content';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useT } from '@/i18n';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { lazyPage } from '@/lib/chunks';
 import { cn } from '@/lib/cn';
 import { useQuality } from '@/three/quality';
 import { isWebGLAvailable } from '@/three/webgl';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
-const HeroScene = lazy(() => import('@/three/HeroScene'));
+const HeroScene = lazyPage(() => import('@/three/HeroScene'));
 
 function SkylinePoster() {
   // Static fallback / poster shown before (or instead of) the WebGL hero.

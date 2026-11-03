@@ -55,4 +55,5 @@
 
 ### Error states
 - [ ] Bad route → 404 page; old course links redirect to the map; a crashing component → error boundary with retry.
+- [ ] New deployment while a tab is open: opening another page reloads once and works; if a page file is still missing, “The site was updated” with a Reload button appears (`src/lib/chunks.ts`).
 - [ ] Python runtime blocked (e.g. offline before first load) → clear error, never fake output.

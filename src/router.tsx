@@ -1,21 +1,21 @@
-import { lazy } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppShell, GameShell, WorkspaceShell } from '@/components/layout/AppShell';
+import { lazyPage } from '@/lib/chunks';
 import { RouteError } from '@/pages/RouteError';
 import LandingPage from '@/pages/LandingPage';
 
-const MapPage = lazy(() => import('@/pages/MapPage'));
-const ZonePage = lazy(() => import('@/pages/ZonePage'));
-const PlayPage = lazy(() => import('@/pages/PlayPage'));
-const BossPage = lazy(() => import('@/pages/BossPage'));
-const QuestsPage = lazy(() => import('@/pages/QuestsPage'));
-const BadgesPage = lazy(() => import('@/pages/BadgesPage'));
-const WorldPage = lazy(() => import('@/pages/WorldPage'));
-const PlaygroundPage = lazy(() => import('@/pages/PlaygroundPage'));
-const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
-const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
-const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+const MapPage = lazyPage(() => import('@/pages/MapPage'));
+const ZonePage = lazyPage(() => import('@/pages/ZonePage'));
+const PlayPage = lazyPage(() => import('@/pages/PlayPage'));
+const BossPage = lazyPage(() => import('@/pages/BossPage'));
+const QuestsPage = lazyPage(() => import('@/pages/QuestsPage'));
+const BadgesPage = lazyPage(() => import('@/pages/BadgesPage'));
+const WorldPage = lazyPage(() => import('@/pages/WorldPage'));
+const PlaygroundPage = lazyPage(() => import('@/pages/PlaygroundPage'));
+const LeaderboardPage = lazyPage(() => import('@/pages/LeaderboardPage'));
+const ProfilePage = lazyPage(() => import('@/pages/ProfilePage'));
+const SettingsPage = lazyPage(() => import('@/pages/SettingsPage'));
+const NotFoundPage = lazyPage(() => import('@/pages/NotFoundPage'));
 
 /** Old links (previous course-based version) lead somewhere sensible. */
 const redirects = ['/dashboard', '/courses/*', '/courses', '/missions', '/progress', '/practice/*', '/admin/*'].map((path) => ({

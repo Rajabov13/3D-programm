@@ -251,6 +251,32 @@ const xpOf = async (page) => {
     await context.close();
   }
 
+  console.log('\nNew version deployed while a tab was open');
+  {
+    // The old tab asks for a page file that no longer exists: it must reload itself once and recover.
+    const { context, page, errors } = await newPage(browser, { width: 1280, height: 800 }, { lang: 'en' });
+    await page.goto(`${BASE}/map`);
+    await page.getByRole('heading', { name: 'Worlds', level: 1 }).waitFor();
+    let missing = 1;
+    await page.route('**/assets/QuestsPage-*.js', (route) => (missing-- > 0 ? route.fulfill({ status: 404, body: 'gone' }) : route.continue()));
+    await page.getByRole('link', { name: 'Quests' }).first().click();
+    ok(await visible(page.getByRole('heading', { name: /Today’s quests/, level: 1 }), 20000), 'a missing page file triggers one reload and the page opens');
+    ok((await page.getByText('The site was updated').count()) === 0, 'no error is shown when the reload fixes it');
+    await page.unroute('**/assets/QuestsPage-*.js');
+
+    // If the file is still missing after the reload, a clear message with a working Reload button appears.
+    await page.goto(`${BASE}/map`);
+    await page.getByRole('heading', { name: 'Worlds', level: 1 }).waitFor();
+    await page.route('**/assets/BadgesPage-*.js', (route) => route.fulfill({ status: 404, body: 'gone' }));
+    await page.evaluate(() => sessionStorage.removeItem('cw.chunkReloadAt'));
+    await page.goto(`${BASE}/badges`);
+    ok(await visible(page.getByText('The site was updated'), 20000), 'a lasting failure shows “The site was updated”, not a broken retry loop');
+    ok(await visible(page.getByRole('button', { name: 'Reload' })), 'and offers a Reload button');
+    await page.screenshot({ path: path.join(SCREENS, 'stale_version.png') });
+    ok(errors.filter((e) => !/QuestsPage|BadgesPage|dynamically imported module|The above error/i.test(e)).length === 0, `no other errors ${errors.join(' | ').slice(0, 300)}`);
+    await context.close();
+  }
+
   console.log('\n3D world (WebGL)');
   {
     // Software WebGL so the 3D path (not the 2D fallback) is exercised in headless CI.

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Lock, Navigation, Play, Swords, X } from 'lucide-react';
+import { ArrowRight, Lock, Play, Swords, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/Progress';
 import { isBossUnlocked } from '@/game/engine';
@@ -11,14 +11,10 @@ export function BuildingPanel({
   info,
   level,
   onClose,
-  onTravel,
-  travelLabel,
 }: {
   info: BuildingInfo;
   level: number;
   onClose: () => void;
-  onTravel?: () => void;
-  travelLabel?: string;
 }) {
   const t = useT();
   const navigate = useNavigate();
@@ -91,11 +87,6 @@ export function BuildingPanel({
         <Button variant={zone && !status.locked ? 'secondary' : 'primary'} onClick={() => navigate(def.route)} icon={<ArrowRight className="h-4 w-4" />}>
           {t('world.open')}
         </Button>
-        {onTravel && (
-          <Button variant="ghost" onClick={onTravel} icon={<Navigation className="h-4 w-4" />}>
-            {travelLabel ?? t('world.fly')}
-          </Button>
-        )}
       </div>
     </section>
   );

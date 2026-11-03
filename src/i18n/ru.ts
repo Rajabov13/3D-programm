@@ -185,8 +185,6 @@ export const ru: Record<DictKey, string> = {
   'world.releaseHint': 'Esc — вернуть курсор',
   'world.enter': 'Войти',
   'world.hint': 'Тяни — вращать · Нажми на здание',
-  'world.fly': 'Лететь',
-  'world.walk': 'Идти ко входу',
   'world.open': 'Открыть',
   'world.helpTitle': 'Управление',
   'world.h.move': 'Ходьба',
@@ -296,4 +294,7 @@ export const ru: Record<DictKey, string> = {
   'learn.means': "Значение",
   'learn.index': "индекс",
   'learn.picture': "Схема",
+
+  'common.updated': "Сайт обновился",
+  'common.updatedHint': "Перезагрузите страницу, чтобы загрузить новую версию.",
 };

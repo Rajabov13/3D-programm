@@ -99,7 +99,8 @@ Source: Deploy from a branch → `gh-pages` / root** must be selected once.
 `index.html`. To host in a sub-folder, build with `BASE_PATH=/folder/ npm run build`. One requirement:
 **`/pyodide/*` must be served with `Access-Control-Allow-Origin: *`**, because the Python sandbox runs in an
 opaque-origin iframe. GitHub Pages sends this header for every file; `public/_headers` (Netlify / Cloudflare
-Pages) and `vercel.json` set it for those hosts.
+Pages) and `vercel.json` set it for those hosts. `vercel.json` also keeps HTML uncached and the hashed
+`assets/` cached forever; a tab left open across a deployment reloads itself once to pick up the new files.
 
 ## Limitations of the demo version
 

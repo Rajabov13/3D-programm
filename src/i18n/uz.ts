@@ -183,8 +183,6 @@ export const uz = {
   'world.releaseHint': 'Esc — kursorni qaytarish',
   'world.enter': 'Kirish',
   'world.hint': 'Suring — aylantirish · Binoni bosing',
-  'world.fly': 'Uchib borish',
-  'world.walk': 'Eshikka yurish',
   'world.open': 'Ochish',
   'world.helpTitle': 'Boshqaruv',
   'world.h.move': 'Yurish',
@@ -294,6 +292,9 @@ export const uz = {
   'learn.means': "Maʼnosi",
   'learn.index': "indeks",
   'learn.picture': "Rasm",
+
+  'common.updated': "Sayt yangilandi",
+  'common.updatedHint': "Yangi versiyani yuklash uchun sahifani qayta yuklang.",
 } as const;
 
 export type DictKey = keyof typeof uz;

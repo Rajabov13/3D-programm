@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CircleHelp, Crosshair, DoorOpen, Layers, List, LogOut, Map as MapIcon, MousePointerClick, RotateCcw, Box } from 'lucide-react';
 import { LanguageSwitcher } from '@/i18n/LanguageSwitcher';
@@ -18,13 +18,14 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useIsCoarsePointer, useIsDesktop } from '@/hooks/useMediaQuery';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useT } from '@/i18n';
+import { lazyPage } from '@/lib/chunks';
 import { cn } from '@/lib/cn';
 import { useQuality } from '@/three/quality';
 import { isWebGLAvailable } from '@/three/webgl';
 import { useWorld, type CameraMode } from '@/three/worldStore';
 import type { BuildingId } from '@/data/buildings';
 
-const World3D = lazy(() => import('@/three/World3D'));
+const World3D = lazyPage(() => import('@/three/World3D'));
 
 const LOCATION_ORDER: BuildingId[] = [
   'html-academy',
@@ -349,8 +350,6 @@ export default function WorldPage() {
               info={selectedInfo}
               level={level}
               onClose={() => select(null)}
-              onTravel={!use2D ? () => select(selectedInfo.def.id, { travel: true }) : undefined}
-              travelLabel={mode === 'walk' ? t('world.walk') : t('world.fly')}
             />
           </div>
         )}

@@ -185,8 +185,6 @@ export const en: Record<DictKey, string> = {
   'world.releaseHint': 'Esc to release the cursor',
   'world.enter': 'Enter',
   'world.hint': 'Drag to orbit · Click a building',
-  'world.fly': 'Fly here',
-  'world.walk': 'Walk to the door',
   'world.open': 'Open',
   'world.helpTitle': 'Controls',
   'world.h.move': 'Walk',
@@ -296,4 +294,7 @@ export const en: Record<DictKey, string> = {
   'learn.means': "Meaning",
   'learn.index': "index",
   'learn.picture': "Picture",
+
+  'common.updated': "The site was updated",
+  'common.updatedHint': "Reload the page to get the new version.",
 };
