@@ -9,7 +9,7 @@ export function Hearts({ hearts, className }: { hearts: number; className?: stri
     <div className={cn('flex items-center gap-1', className)} role="img" aria-label={t('play.hearts', { n: hearts })}>
       {Array.from({ length: MAX_HEARTS }, (_, i) =>
         i < hearts ? (
-          <Heart key={i} className="h-6 w-6 fill-rose-500 text-rose-400 drop-shadow-[0_0_6px_rgba(244,63,94,0.6)]" aria-hidden />
+          <Heart key={i} className="h-6 w-6 fill-[#f43f5e] text-[#e11d48]" aria-hidden />
         ) : (
           <HeartCrack key={i} className="h-6 w-6 text-slate-600" aria-hidden />
         ),
@@ -28,7 +28,7 @@ export function Stars({ value, size = 20, className, animate = false }: { value:
           aria-hidden
           style={animate ? { animationDelay: `${n * 220}ms` } : undefined}
           className={cn(
-            n <= value ? 'fill-amber-300 text-amber-300 drop-shadow-[0_0_6px_rgba(252,211,77,0.55)]' : 'fill-white/5 text-white/15',
+            n <= value ? 'fill-[#fbbf24] text-[#f59e0b]' : 'fill-white/[0.06] text-white/20',
             animate && n <= value && 'animate-star-pop',
           )}
         />

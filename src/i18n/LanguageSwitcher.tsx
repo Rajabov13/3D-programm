@@ -19,7 +19,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
           onClick={() => setLang(l.id)}
           className={cn(
             'focus-ring rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wide transition-colors',
-            lang === l.id ? 'bg-cyan-300 text-night-950' : 'text-slate-400 hover:text-white',
+            lang === l.id ? 'bg-primary text-primary-fg' : 'text-slate-400 hover:text-white',
           )}
         >
           {l.short}

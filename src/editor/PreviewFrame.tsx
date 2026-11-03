@@ -90,7 +90,7 @@ export const PreviewFrame = forwardRef<PreviewHandle, { doc: string | null; runI
         referrerPolicy="no-referrer"
         allow=""
         srcDoc={doc ?? `<!DOCTYPE html><html><body style="margin:0;display:grid;place-items:center;height:100vh;font:15px system-ui;color:#64748b;background:#fff">${tNow('editor.emptyPreviewDoc')}</body></html>`}
-        className="h-full w-full border-0 bg-white"
+        className="h-full w-full border-0 bg-[#fff]"
       />
     );
   },

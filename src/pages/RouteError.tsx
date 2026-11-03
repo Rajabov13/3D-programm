@@ -15,7 +15,7 @@ export function RouteError() {
         <h1 className="text-2xl">{stale ? t('common.updated') : t('common.error')}</h1>
         {message && <p className="mt-3 break-words text-sm text-slate-400">{message}</p>}
         <div className="mt-6 flex justify-center gap-3">
-          <button type="button" onClick={() => window.location.reload()} className="focus-ring rounded-xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-night-950">
+          <button type="button" onClick={() => window.location.reload()} className="focus-ring rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-fg">
             {t('common.reload')}
           </button>
           <Link to="/map" className="focus-ring rounded-xl border border-white/10 px-4 py-2 text-sm text-slate-200">

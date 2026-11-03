@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import Editor, { type OnMount } from '@monaco-editor/react';
 import { Spinner } from '@/components/ui/Feedback';
 import { useSettings } from '@/features/settings/settingsStore';
+import { useResolvedTheme } from '@/hooks/useTheme';
 import { tNow } from '@/i18n';
 import './monaco';
 
@@ -21,6 +22,7 @@ export interface CodeEditorProps {
 
 export function CodeEditor({ value, onChange, language, path, ariaLabel, onRun, onCheck, readOnly }: CodeEditorProps) {
   const { editorFontSize, editorWordWrap, editorMinimap } = useSettings();
+  const theme = useResolvedTheme();
   const runRef = useRef(onRun);
   const checkRef = useRef(onCheck);
   runRef.current = onRun;
@@ -49,7 +51,7 @@ export function CodeEditor({ value, onChange, language, path, ariaLabel, onRun, 
 
   return (
     <Editor
-      theme="codeworld"
+      theme={theme === 'light' ? 'codeworld-light' : 'codeworld'}
       path={path}
       language={language}
       value={value}
@@ -105,7 +107,7 @@ export function FallbackEditor({ value, onChange, ariaLabel }: { value: string; 
           requestAnimationFrame(() => el.setSelectionRange(selectionStart + 2, selectionStart + 2));
         }
       }}
-      className="h-full w-full resize-none bg-[#070c17] p-4 font-mono text-[13px] leading-6 text-slate-100 outline-none"
+      className="h-full w-full resize-none bg-code p-4 font-mono text-[13px] leading-6 text-slate-100 outline-none"
     />
   );
 }

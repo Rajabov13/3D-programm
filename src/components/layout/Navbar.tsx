@@ -6,6 +6,7 @@ import { useT } from '@/i18n';
 import { cn } from '@/lib/cn';
 import { Logo } from './Logo';
 import { NAV_ITEMS } from './nav';
+import { ThemeToggle } from './ThemeToggle';
 import { UserMenu } from './UserMenu';
 import { XpChip } from './XpChip';
 
@@ -29,7 +30,7 @@ export function Navbar({ transparent = false }: { transparent?: boolean }) {
         transparent ? 'bg-gradient-to-b from-night-950/80 to-transparent' : 'border-b border-white/[0.06] bg-night-950/75 backdrop-blur-xl',
       )}
     >
-      <a href="#main" className="focus-ring sr-only z-50 rounded-md bg-cyan-300 px-3 py-2 text-night-950 focus:not-sr-only focus:absolute focus:left-3 focus:top-3">
+      <a href="#main" className="focus-ring sr-only z-50 rounded-md bg-primary px-3 py-2 text-primary-fg focus:not-sr-only focus:absolute focus:left-3 focus:top-3">
         {t('nav.skip')}
       </a>
       <nav aria-label={t('nav.primary')} className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
@@ -54,6 +55,7 @@ export function Navbar({ transparent = false }: { transparent?: boolean }) {
         </ul>
         <div className="ml-auto flex items-center gap-2">
           <LanguageSwitcher className="hidden sm:inline-flex" />
+          <ThemeToggle />
           <XpChip />
           <UserMenu />
           <button

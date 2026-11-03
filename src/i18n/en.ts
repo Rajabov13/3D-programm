@@ -297,4 +297,10 @@ export const en: Record<DictKey, string> = {
 
   'common.updated': "The site was updated",
   'common.updatedHint': "Reload the page to get the new version.",
+
+  'nav.theme': "Switch theme",
+  'settings.theme': "Appearance",
+  'settings.t.light': "Light",
+  'settings.t.dark': "Dark",
+  'settings.t.system': "Same as device",
 };

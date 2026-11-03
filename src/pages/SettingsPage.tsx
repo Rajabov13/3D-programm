@@ -1,9 +1,9 @@
 import { useMemo, type ReactNode } from 'react';
-import { Code2, Gamepad2, Languages, MonitorCog, Volume2 } from 'lucide-react';
+import { Code2, Gamepad2, Languages, MonitorCog, Moon, Palette, Smartphone, Sun, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { SegmentedControl, Select, Switch } from '@/components/ui/Field';
 import { InlineAlert } from '@/components/ui/Feedback';
-import { useSettings, type GraphicsQuality, type MotionPreference } from '@/features/settings/settingsStore';
+import { useSettings, type GraphicsQuality, type MotionPreference, type ThemePreference } from '@/features/settings/settingsStore';
 import { sfx } from '@/game/sound';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { LANGS, useLangStore, useT } from '@/i18n';
@@ -45,11 +45,38 @@ export default function SettingsPage() {
               onClick={() => setLang(l.id)}
               className={cn(
                 'focus-ring rounded-2xl border-2 px-3 py-3 text-center font-semibold transition-colors',
-                lang === l.id ? 'border-cyan-300 bg-cyan-300/10 text-white' : 'border-white/10 text-slate-400 hover:border-white/25 hover:text-white',
+                lang === l.id ? 'border-primary bg-primary/10 text-white' : 'border-white/10 text-slate-400 hover:border-white/25 hover:text-white',
               )}
             >
-              <span className="block text-xs font-black tracking-widest text-cyan-300/80">{l.short}</span>
+              <span className="block text-xs font-black tracking-widest text-cyan-300">{l.short}</span>
               {l.label}
+            </button>
+          ))}
+        </div>
+      </Section>
+
+      <Section icon={<Palette className="h-5 w-5" />} title={t('settings.theme')}>
+        <div role="radiogroup" aria-label={t('settings.theme')} className="grid grid-cols-3 gap-2">
+          {(
+            [
+              ['light', Sun, 'settings.t.light'],
+              ['dark', Moon, 'settings.t.dark'],
+              ['system', Smartphone, 'settings.t.system'],
+            ] as const
+          ).map(([value, Icon, key]) => (
+            <button
+              key={value}
+              type="button"
+              role="radio"
+              aria-checked={settings.theme === value}
+              onClick={() => settings.update({ theme: value as ThemePreference })}
+              className={cn(
+                'focus-ring flex flex-col items-center gap-1.5 rounded-2xl border-2 px-2 py-3 text-center text-sm font-semibold transition-colors',
+                settings.theme === value ? 'border-primary bg-primary/10 text-white' : 'border-white/10 text-slate-400 hover:border-white/25 hover:text-white',
+              )}
+            >
+              <Icon className="h-5 w-5" aria-hidden />
+              {t(key)}
             </button>
           ))}
         </div>

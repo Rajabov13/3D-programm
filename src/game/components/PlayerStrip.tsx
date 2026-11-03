@@ -37,7 +37,7 @@ export function PlayerStrip() {
           <span className="sr-only">{t('profile.streak')}</span>
         </span>
         <span className="flex items-center gap-1.5 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2 text-lg font-bold text-white" title={t('profile.stars')}>
-          <Star className="h-5 w-5 fill-amber-300 text-amber-300" aria-hidden />
+          <Star className="h-5 w-5 fill-[#fbbf24] text-[#f59e0b]" aria-hidden />
           {stats.stars}
           <span className="text-sm font-medium text-slate-500">/{TOTAL_STARS}</span>
         </span>

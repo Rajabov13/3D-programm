@@ -12,6 +12,7 @@ import { cn } from '@/lib/cn';
 import { useQuality } from '@/three/quality';
 import { isWebGLAvailable } from '@/three/webgl';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { accentInk } from '@/lib/accent';
 
 const HeroScene = lazyPage(() => import('@/three/HeroScene'));
 
@@ -87,11 +88,12 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="absolute inset-x-0 top-0 z-40">
+      <div data-theme="dark" className="absolute inset-x-0 top-0 z-40">
         <Navbar transparent />
       </div>
 
-      <section className="relative isolate flex min-h-[100svh] items-center overflow-hidden" aria-labelledby="hero-title">
+      {/* The hero sits on the night-time 3D city, so it always uses the dark palette. */}
+      <section data-theme="dark" className="relative isolate flex min-h-[100svh] items-center overflow-hidden bg-night-950" aria-labelledby="hero-title">
         <HeroBackground />
         <div id="main" className="relative mx-auto w-full max-w-6xl px-4 pb-20 pt-28 sm:px-6">
           <div className="max-w-2xl">
@@ -114,7 +116,7 @@ export default function LandingPage() {
                 <li
                   key={z.id}
                   className="rounded-xl border px-3 py-1.5 font-mono text-sm font-bold backdrop-blur"
-                  style={{ borderColor: `${z.accent}55`, color: z.accent, background: `${z.accent}14` }}
+                  style={{ borderColor: `${z.accent}55`, color: accentInk(z.accent), background: `${z.accent}14` }}
                   title={t(z.nameKey)}
                 >
                   {z.symbol}

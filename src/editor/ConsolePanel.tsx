@@ -19,7 +19,7 @@ export function ConsolePanel({ entries, onClear, emptyHint }: { entries: Console
     end.current?.scrollIntoView({ block: 'nearest' });
   }, [entries.length]);
   return (
-    <div className="flex h-full flex-col bg-[#060a14]">
+    <div className="flex h-full flex-col bg-code">
       <div className="flex items-center justify-between border-b border-white/[0.06] px-3 py-1.5">
         <span className="text-[11px] text-slate-500">{entries.length ? t('console.messages', { n: entries.length }) : t('editor.console')}</span>
         <button type="button" onClick={onClear} className="focus-ring inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] text-slate-400 hover:bg-white/10 hover:text-white" aria-label={t('editor.clear')}>

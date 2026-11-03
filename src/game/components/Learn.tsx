@@ -72,12 +72,13 @@ function PagePreview({ html, css }: { html: string; css?: string }) {
 
 export function BrowserMock({ view, fallbackHtml, fallbackCss }: { view: BrowserView; fallbackHtml?: string; fallbackCss?: string }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-slate-200 shadow-lg shadow-black/30">
-      <div className="flex items-center gap-2 bg-slate-300/80 px-3 py-1.5" aria-hidden>
-        <span className="h-2.5 w-2.5 rounded-full bg-rose-400" />
-        <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-        <span className="ml-2 min-w-0 flex-1 truncate rounded-md bg-white/80 px-2.5 py-0.5 text-[11px] text-slate-600">{view.title ?? 'index.html'}</span>
+    // A real (light) browser window in both themes: fixed colours, not theme tokens.
+    <div className="overflow-hidden rounded-2xl border border-[#cbd5e1] bg-[#fff] shadow-card">
+      <div className="flex items-center gap-2 border-b border-[#e2e8f0] bg-[#f1f5f9] px-3 py-1.5" aria-hidden>
+        <span className="h-2.5 w-2.5 rounded-full bg-[#f87171]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#fbbf24]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#34d399]" />
+        <span className="ml-2 min-w-0 flex-1 truncate rounded-md border border-[#e2e8f0] bg-[#fff] px-2.5 py-0.5 text-[11px] text-[#475569]">{view.title ?? 'index.html'}</span>
       </div>
       <PagePreview html={view.html ?? fallbackHtml ?? ''} css={view.css ?? fallbackCss} />
     </div>
@@ -87,7 +88,8 @@ export function BrowserMock({ view, fallbackHtml, fallbackCss }: { view: Browser
 export function TerminalMock({ lines }: { lines: string[] }) {
   const t = useT();
   return (
-    <div className="overflow-hidden rounded-2xl border border-emerald-300/20 bg-[#030806]">
+    // Terminals stay dark in both themes.
+    <div data-theme="dark" className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1220]">
       <div className="flex items-center gap-1.5 border-b border-white/[0.06] px-3 py-1.5 text-[11px] font-semibold text-emerald-300/80">
         <Terminal className="h-3.5 w-3.5" aria-hidden /> {t('editor.console')}
       </div>
@@ -125,7 +127,7 @@ function PartsPicture({ picture }: { picture: Extract<Picture, { kind: 'parts' }
   if (rest) segments.push({ text: rest });
   return (
     <div className="space-y-3">
-      <pre className="overflow-x-auto rounded-2xl border border-white/[0.08] bg-[#060a14] p-4 font-mono text-[15px] leading-8 text-slate-200">
+      <pre className="overflow-x-auto rounded-2xl border border-white/[0.08] bg-code p-4 font-mono text-[15px] leading-8 text-slate-200">
         <code>
           {segments.map((s, i) =>
             s.part === undefined ? (

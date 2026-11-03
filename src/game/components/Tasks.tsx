@@ -199,7 +199,7 @@ export function OrderTask({ task, value, onChange, reveal }: { task: Extract<Tas
       <div
         className={cn(
           'min-h-[120px] rounded-2xl border-2 border-dashed p-3 font-mono text-[14px] sm:text-[15px]',
-          reveal ? (reveal.correct ? 'border-emerald-400/60 bg-emerald-400/[0.06]' : 'border-rose-400/60 bg-rose-500/[0.06]') : 'border-white/15 bg-[#060a14]',
+          reveal ? (reveal.correct ? 'border-emerald-400/60 bg-emerald-400/[0.06]' : 'border-rose-400/60 bg-rose-500/[0.06]') : 'border-white/15 bg-code',
         )}
         aria-label={t('play.answer')}
       >
@@ -255,7 +255,7 @@ export function BugTask({ task, value, onChange, reveal }: { task: Extract<Task,
   const lang = LANG_MAP[task.lang];
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#060a14] py-2 font-mono text-[14px] sm:text-[15px]">
+      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-code py-2 font-mono text-[14px] sm:text-[15px]">
         {task.lines.map((line, i) => {
           const selected = chosen === i;
           const state = reveal ? (i === task.bug ? 'bug' : selected ? 'wrong' : 'idle') : selected ? 'selected' : 'idle';

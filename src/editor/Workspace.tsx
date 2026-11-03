@@ -99,7 +99,7 @@ export function Workspace(props: WorkspaceProps) {
 
   const current = tabs.find((t) => t.key === activeFile) ?? tabs[0];
   const editor = (
-    <div className="flex h-full min-h-0 flex-col bg-[#070c17]">
+    <div className="flex h-full min-h-0 flex-col bg-code">
       <div role="tablist" aria-label={t('editor.files')} className="flex shrink-0 items-center gap-0.5 overflow-x-auto border-b border-white/[0.06] bg-night-900/80 px-1.5 no-scrollbar">
         {tabs.map((tab) => (
           <button

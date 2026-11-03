@@ -277,6 +277,73 @@ const xpOf = async (page) => {
     await context.close();
   }
 
+  console.log('\nLight / dark theme');
+  {
+    const { context, page, errors } = await newPage(browser, { width: 1280, height: 860 }, { lang: 'uz' });
+    await page.goto(`${BASE}/map`);
+    await page.getByRole('heading', { name: 'Olamlar', level: 1 }).waitFor();
+    const themeOf = () => page.evaluate(() => document.documentElement.dataset.theme);
+    const bodyBg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    ok((await themeOf()) === 'light' && (await bodyBg()) === 'rgb(245, 247, 251)', 'the site opens in the light theme by default');
+    await page.getByRole('button', { name: /Mavzuni almashtirish/ }).click();
+    ok((await themeOf()) === 'dark' && (await bodyBg()) === 'rgb(14, 21, 37)', 'the navbar button switches to the dark theme');
+    await page.reload();
+    await page.getByRole('heading', { name: 'Olamlar', level: 1 }).waitFor();
+    ok((await themeOf()) === 'dark', 'the theme is remembered after a reload (no flash: set before React starts)');
+    await page.goto(`${BASE}/settings`);
+    await page.getByRole('radio', { name: /Yorugʻ/ }).click();
+    ok((await themeOf()) === 'light', 'Settings → Koʻrinish → Yorugʻ switches back');
+    await page.goto(`${BASE}/world`);
+    ok((await page.locator('#main[data-theme="dark"]').count()) === 1, 'the 3D city keeps its night (dark) look in the light theme');
+
+    // Every visible text must be readable (WCAG AA: 4.5:1, or 3:1 for large text) in both themes.
+    const audit = () => {
+      const parse = (c) => { const m = c.match(/rgba?\(([^)]+)\)/); if (!m) return null; const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; };
+      const over = (t, b) => ({ r: t.r * t.a + b.r * (1 - t.a), g: t.g * t.a + b.g * (1 - t.a), b: t.b * t.a + b.b * (1 - t.a), a: 1 });
+      const lum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
+      const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+      const bgOf = (el) => {
+        const chain = [];
+        for (let e = el; e; e = e.parentElement) { const cs = getComputedStyle(e); if (cs.backgroundImage !== 'none') return null; const c = parse(cs.backgroundColor); if (c && c.a > 0) chain.push(c); }
+        let bg = { r: 255, g: 255, b: 255, a: 1 };
+        for (let i = chain.length - 1; i >= 0; i--) bg = over(chain[i], bg);
+        return bg;
+      };
+      const bad = [];
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        const el = n.parentElement; const text = n.textContent.trim();
+        if (!el || !text || el.closest('svg,canvas,[aria-hidden="true"],button:disabled,.monaco-editor,.text-gradient,option,select')) continue;
+        const r = el.getBoundingClientRect(); if (!r.width || !r.height) continue;
+        const cs = getComputedStyle(el); if (cs.visibility === 'hidden') continue;
+        let op = 1; for (let e = el; e; e = e.parentElement) op *= +getComputedStyle(e).opacity; if (op < 0.5) continue;
+        const bg = bgOf(el); const fg = parse(cs.color); if (!bg || !fg) continue;
+        const c = ratio(over(fg, bg), bg);
+        const big = parseFloat(cs.fontSize) >= 18.5 || (parseFloat(cs.fontSize) >= 14 && +cs.fontWeight >= 700);
+        if (c < (big ? 3 : 4.5)) bad.push(`${c.toFixed(2)} “${text.slice(0, 24)}”`);
+      }
+      return bad;
+    };
+    for (const theme of ['light', 'dark']) {
+      await page.evaluate((t) => {
+        const s = JSON.parse(localStorage.getItem('cw.settings.v1') || '{"state":{},"version":1}');
+        s.state.theme = t;
+        localStorage.setItem('cw.settings.v1', JSON.stringify(s));
+      }, theme);
+      const low = [];
+      for (const route of ['/map', '/zone/html', '/play/html-1', '/quests', '/badges', '/profile', '/settings', '/leaderboard']) {
+        await page.goto(`${BASE}${route}`);
+        await page.locator('h1').first().waitFor();
+        await page.waitForTimeout(300);
+        low.push(...(await page.evaluate(audit)).map((x) => `${route} ${x}`));
+      }
+      ok(low.length === 0, `all text is readable in the ${theme} theme ${low.slice(0, 6).join(' | ')}`);
+      await page.screenshot({ path: path.join(SCREENS, `theme_${theme}_settings.png`) });
+    }
+    ok(errors.length === 0, `no runtime errors while switching themes ${errors.join(' | ')}`);
+    await context.close();
+  }
+
   console.log('\n3D world (WebGL)');
   {
     // Software WebGL so the 3D path (not the 2D fallback) is exercised in headless CI.

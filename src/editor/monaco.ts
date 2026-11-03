@@ -87,6 +87,40 @@ monaco.editor.defineTheme('codeworld', {
   },
 });
 
+/** Light editor theme (GitHub-like syntax colours) for the light site theme. */
+monaco.editor.defineTheme('codeworld-light', {
+  base: 'vs',
+  inherit: true,
+  rules: [
+    { token: 'comment', foreground: '6a737d', fontStyle: 'italic' },
+    { token: 'keyword', foreground: '7c3aed' },
+    { token: 'string', foreground: '047857' },
+    { token: 'number', foreground: 'b45309' },
+    { token: 'type', foreground: '1d4ed8' },
+    { token: 'tag', foreground: '0369a1' },
+    { token: 'attribute.name', foreground: '7c3aed' },
+    { token: 'attribute.value', foreground: '047857' },
+    { token: 'delimiter', foreground: '64748b' },
+  ],
+  colors: {
+    'editor.background': '#f8fafc',
+    'editor.foreground': '#0f172a',
+    'editor.lineHighlightBackground': '#eef2f7',
+    'editor.selectionBackground': '#bfdbfe',
+    'editor.inactiveSelectionBackground': '#dbeafe',
+    'editorCursor.foreground': '#2563eb',
+    'editorLineNumber.foreground': '#94a3b8',
+    'editorLineNumber.activeForeground': '#334155',
+    'editorIndentGuide.background1': '#e2e8f0',
+    'editorIndentGuide.activeBackground1': '#cbd5e1',
+    'editorWidget.background': '#ffffff',
+    'editorWidget.border': '#e2e8f0',
+    'editorSuggestWidget.background': '#ffffff',
+    'editorSuggestWidget.selectedBackground': '#dbeafe',
+    'editorGutter.background': '#f8fafc',
+  },
+});
+
 loader.config({ monaco: monaco as unknown as typeof import('monaco-editor') });
 
 export { monaco };

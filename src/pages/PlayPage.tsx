@@ -16,6 +16,7 @@ import type { Stage, Zone } from '@/game/types';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useL, useT } from '@/i18n';
 import { cn } from '@/lib/cn';
+import { accentInk } from '@/lib/accent';
 
 export default function PlayPage() {
   const { stageId } = useParams();
@@ -234,7 +235,7 @@ function StageRun({ stage, zone, index, canSkipLearning, onRestart }: { stage: S
         <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 pb-40 pt-6">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: zone.accent }}>
+              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentInk(zone.accent) }}>
                 {t('zone.stage', { n: index + 1 })} · {t('learn.progress', { n: card + 1, total: cards.length })}
               </p>
               <h1 className="mt-0.5 text-lg font-bold text-slate-300">{l(stage.title)}</h1>
@@ -305,7 +306,7 @@ function StageRun({ stage, zone, index, canSkipLearning, onRestart }: { stage: S
     return (
       <Centered>
         <Confetti fire={confetti} />
-        <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: zone.accent }}>
+        <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: accentInk(zone.accent) }}>
           {t('zone.stage', { n: index + 1 })} · {l(stage.title)}
         </p>
         <h1 className="mt-2 text-3xl font-bold sm:text-4xl">{t('play.complete')}</h1>
@@ -392,7 +393,7 @@ function StageRun({ stage, zone, index, canSkipLearning, onRestart }: { stage: S
             <MatchTask task={task} done={Boolean(reveal)} onDone={(m) => apply(m === 0, false)} />
           )}
         </div>
-        <p className="mt-6 hidden text-center text-xs text-slate-600 md:block">{t('play.keys')}</p>
+        <p className="mt-6 hidden text-center text-xs text-slate-500 md:block">{t('play.keys')}</p>
       </main>
 
       <footer

@@ -9,7 +9,7 @@ export const LANG_MAP: Record<CodeLang, CodeLanguage> = { html: 'html', css: 'cs
 export function CodeView({ code, lang, fill, className }: { code: string; lang: CodeLang; fill?: { text: string; state?: 'chosen' | 'correct' | 'wrong' }; className?: string }) {
   const parts = code.split('___');
   return (
-    <pre className={cn('overflow-x-auto rounded-2xl border border-white/[0.08] bg-[#060a14] p-4 font-mono text-[14px] leading-7 text-slate-200 sm:text-[15px]', className)}>
+    <pre className={cn('overflow-x-auto rounded-2xl border border-white/[0.08] bg-code p-4 font-mono text-[14px] leading-7 text-slate-200 sm:text-[15px]', className)}>
       <code>
         {parts.map((part, i) => (
           <Fragment key={i}>

@@ -9,6 +9,7 @@ import { useGame } from '@/game/store';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useT } from '@/i18n';
 import { cn } from '@/lib/cn';
+import { accentInk, ON_ACCENT } from '@/lib/accent';
 
 export default function MapPage() {
   const t = useT();
@@ -28,7 +29,7 @@ export default function MapPage() {
           className="focus-ring group relative flex w-full items-center gap-4 overflow-hidden rounded-3xl border-2 p-5 text-left transition-transform active:scale-[0.99]"
           style={{ borderColor: `${goal.zone.accent}88`, background: `linear-gradient(120deg, ${goal.zone.accent}22, transparent 70%)` }}
         >
-          <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl text-night-950 shadow-lg" style={{ background: goal.zone.accent }}>
+          <span className={cn('grid h-16 w-16 shrink-0 place-items-center rounded-2xl shadow-sm', ON_ACCENT)} style={{ background: goal.zone.accent }}>
             {goal.boss ? <Swords className="h-8 w-8" aria-hidden /> : <Play className="h-8 w-8 fill-current" aria-hidden />}
           </span>
           <span className="min-w-0 flex-1">
@@ -85,14 +86,14 @@ export default function MapPage() {
                   to={`/zone/${zone.id}`}
                   className={cn(
                     'focus-ring group relative flex h-full flex-col overflow-hidden rounded-3xl border-2 p-5 transition-all hover:-translate-y-1',
-                    unlocked ? 'border-white/10 bg-night-800/60 hover:border-white/25' : 'border-white/5 bg-night-900/60',
+                    unlocked ? 'border-white/10 bg-night-800 shadow-card hover:border-white/25' : 'border-white/[0.06] bg-night-900/70',
                   )}
                 >
-                  <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-30 blur-3xl transition-opacity group-hover:opacity-60" style={{ background: zone.accent }} />
+                  <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-[0.12] blur-3xl transition-opacity group-hover:opacity-25" style={{ background: zone.accent }} />
                   <div className="flex items-start justify-between">
                     <span
                       className={cn('grid h-16 w-16 place-items-center rounded-2xl font-mono text-lg font-black', !unlocked && 'grayscale')}
-                      style={{ background: `${zone.accent}22`, color: zone.accent, boxShadow: `inset 0 0 0 2px ${zone.accent}66` }}
+                      style={{ background: `${zone.accent}22`, color: accentInk(zone.accent), boxShadow: `inset 0 0 0 2px ${zone.accent}66` }}
                     >
                       {zone.symbol}
                     </span>
@@ -109,7 +110,7 @@ export default function MapPage() {
                       <ProgressBar className="mt-3" value={stars} max={zone.stages.length * 3} tone="amber" label={`${t(zone.nameKey)} ⭐`} />
                     </>
                   ) : (
-                    <p className="mt-2 flex items-center gap-1.5 text-sm text-amber-200/80">
+                    <p className="mt-2 flex items-center gap-1.5 text-sm text-amber-200">
                       <Lock className="h-4 w-4" aria-hidden /> {t('common.unlocksAt', { n: zone.requiredLevel })}
                     </p>
                   )}

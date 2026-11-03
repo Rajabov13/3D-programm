@@ -16,6 +16,7 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useDraft } from '@/hooks/useDraft';
 import { useL, useT } from '@/i18n';
 import { cn } from '@/lib/cn';
+import { accentInk, ON_ACCENT } from '@/lib/accent';
 
 const parseHtml = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -132,8 +133,8 @@ function BossFight({ zone }: { zone: Zone }) {
             <span
               className={cn(
                 'grid h-6 w-6 shrink-0 place-items-center rounded-full',
-                status === 'pass' && 'bg-emerald-400 text-night-950',
-                status === 'fail' && 'bg-rose-400 text-night-950',
+                status === 'pass' && 'bg-emerald-500 text-[#fff]',
+                status === 'fail' && 'bg-rose-500 text-[#fff]',
                 !status && 'text-slate-500',
               )}
               aria-hidden
@@ -170,11 +171,11 @@ function BossFight({ zone }: { zone: Zone }) {
   const sidebar = (
     <div className="h-full space-y-5 overflow-auto p-5">
       <div className="flex items-center gap-3">
-        <span className="grid h-14 w-14 shrink-0 animate-float place-items-center rounded-2xl text-night-950 shadow-lg" style={{ background: zone.accent }}>
+        <span className={cn('grid h-14 w-14 shrink-0 animate-float place-items-center rounded-2xl shadow-lg', ON_ACCENT)} style={{ background: zone.accent }}>
           <Swords className="h-7 w-7" aria-hidden />
         </span>
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: zone.accent }}>
+          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentInk(zone.accent) }}>
             {t(zone.nameKey)} · {t('zone.boss')}
           </p>
           <h1 className="truncate text-2xl font-bold">{l(boss.name)}</h1>
@@ -225,7 +226,7 @@ function BossFight({ zone }: { zone: Zone }) {
           <X className="h-5 w-5" />
         </Link>
         <p className="flex min-w-0 items-center gap-2 font-semibold">
-          <Swords className="h-4 w-4 shrink-0" style={{ color: zone.accent }} aria-hidden />
+          <Swords className="h-4 w-4 shrink-0" style={{ color: accentInk(zone.accent) }} aria-hidden />
           <span className="truncate">{t('boss.title', { name: l(boss.name) })}</span>
         </p>
       </header>
@@ -253,7 +254,7 @@ function BossFight({ zone }: { zone: Zone }) {
       {win && (
         <div className="fixed inset-0 z-[70] grid place-items-center bg-night-950/80 p-6 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="boss-win">
           <div className="glass-strong w-full max-w-md animate-pop-in rounded-3xl p-8 text-center">
-            <Trophy className="mx-auto h-16 w-16 animate-star-pop text-amber-300 drop-shadow-[0_0_18px_rgba(252,211,77,0.6)]" aria-hidden />
+            <Trophy className="mx-auto h-16 w-16 animate-star-pop text-[#f59e0b]" aria-hidden />
             <h2 id="boss-win" className="mt-4 text-3xl font-bold">
               {t('boss.win')}
             </h2>

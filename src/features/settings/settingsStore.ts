@@ -3,9 +3,11 @@ import { persist } from 'zustand/middleware';
 
 export type GraphicsQuality = 'auto' | 'high' | 'medium' | 'low' | '2d';
 export type MotionPreference = 'system' | 'reduce' | 'full';
+export type ThemePreference = 'light' | 'dark' | 'system';
 
 /** Device-local preferences (graphics/editor). Account preferences live in the backend. */
 export interface DeviceSettings {
+  theme: ThemePreference;
   graphicsQuality: GraphicsQuality;
   motion: MotionPreference;
   editorFontSize: number;
@@ -23,6 +25,7 @@ interface SettingsState extends DeviceSettings {
 }
 
 const defaults: DeviceSettings = {
+  theme: 'light',
   graphicsQuality: 'auto',
   motion: 'system',
   editorFontSize: 14,

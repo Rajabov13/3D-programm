@@ -17,10 +17,11 @@ export function ProgressBar({
 }) {
   const ratio = max > 0 ? Math.min(1, Math.max(0, value / max)) : 0;
   const fill = {
-    cyan: 'from-cyan-300 to-sky-500',
-    violet: 'from-violet-300 to-indigo-500',
-    green: 'from-emerald-300 to-teal-500',
-    amber: 'from-amber-200 to-orange-400',
+    // Mid-tone fills: the same look in the light and the dark theme.
+    cyan: 'from-[#3b82f6] to-[#2563eb]',
+    violet: 'from-[#8b5cf6] to-[#6366f1]',
+    green: 'from-[#34d399] to-[#10b981]',
+    amber: 'from-[#fbbf24] to-[#f97316]',
   }[tone];
   return (
     <div
@@ -62,7 +63,7 @@ export function ProgressRing({
   return (
     <div className="relative inline-grid place-items-center" style={{ width: size, height: size }} role="img" aria-label={label}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" style={{ stroke: 'rgb(var(--c-white) / 0.1)' }} strokeWidth={stroke} />
         <circle
           cx={size / 2}
           cy={size / 2}

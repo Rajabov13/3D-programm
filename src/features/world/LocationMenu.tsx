@@ -36,7 +36,7 @@ export function LocationMenu({
                   selectedId === id ? 'bg-white/[0.1]' : 'hover:bg-white/[0.06]',
                 )}
               >
-                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: info.def.accent, boxShadow: `0 0 10px ${info.def.accent}` }} aria-hidden />
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: info.def.accent }} aria-hidden />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13px] font-medium text-slate-100">{info.name}</span>
                   <span className="block truncate text-[11px] text-slate-500">{info.summary}</span>

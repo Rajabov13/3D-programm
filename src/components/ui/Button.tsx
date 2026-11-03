@@ -10,10 +10,9 @@ const base =
   'relative inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-xl font-medium transition-[background-color,border-color,color,box-shadow,transform] duration-200 focus-ring disabled:pointer-events-none disabled:opacity-45 active:translate-y-px';
 
 const variants: Record<ButtonVariant, string> = {
-  primary:
-    'bg-gradient-to-b from-cyan-300 to-sky-500 text-night-950 shadow-[0_0_0_1px_rgba(92,225,255,0.35),0_10px_30px_-10px_rgba(56,189,248,0.7)] hover:from-cyan-200 hover:to-sky-400',
-  secondary: 'border border-white/10 bg-white/[0.06] text-slate-100 hover:border-white/20 hover:bg-white/[0.1]',
-  outline: 'border border-cyan-300/30 bg-cyan-300/[0.04] text-cyan-100 hover:border-cyan-300/60 hover:bg-cyan-300/[0.1]',
+  primary: 'bg-primary font-semibold text-primary-fg shadow-sm hover:bg-primary-hover',
+  secondary: 'border border-white/[0.14] bg-night-800 text-slate-100 shadow-sm hover:border-white/25 hover:bg-night-700',
+  outline: 'border border-cyan-500/40 bg-transparent text-cyan-300 hover:border-cyan-500/70 hover:bg-cyan-500/[0.06]',
   ghost: 'text-slate-300 hover:bg-white/[0.06] hover:text-white',
   danger: 'border border-rose-400/30 bg-rose-500/10 text-rose-200 hover:bg-rose-500/20',
 };

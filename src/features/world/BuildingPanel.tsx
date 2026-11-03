@@ -6,6 +6,7 @@ import { isBossUnlocked } from '@/game/engine';
 import { useGame } from '@/game/store';
 import { useT } from '@/i18n';
 import type { BuildingInfo } from './useBuildingStatuses';
+import { accentInk } from '@/lib/accent';
 
 export function BuildingPanel({
   info,
@@ -35,7 +36,7 @@ export function BuildingPanel({
         <div className="flex items-center gap-3">
           <span
             className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border font-mono text-sm font-bold"
-            style={{ borderColor: `${def.accent}55`, background: `${def.accent}14`, color: def.accent }}
+            style={{ borderColor: `${def.accent}55`, background: `${def.accent}14`, color: accentInk(def.accent) }}
             aria-hidden
           >
             {def.symbol}

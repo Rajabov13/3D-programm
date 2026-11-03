@@ -39,7 +39,7 @@ export default function LeaderboardPage() {
         <Crown className="h-8 w-8 text-amber-300" aria-hidden /> {t('lb.title')}
       </h1>
       <p className="mt-2 text-sm text-slate-500">{t('lb.sample')}</p>
-      {!profile.showOnLeaderboard && <p className="mt-2 text-sm text-amber-200/80">{t('lb.hidden')}</p>}
+      {!profile.showOnLeaderboard && <p className="mt-2 text-sm text-amber-200">{t('lb.hidden')}</p>}
       <ol className="mt-6 space-y-2">
         {rows.map((r, i) => (
           <li
@@ -56,7 +56,7 @@ export default function LeaderboardPage() {
             <Avatar preset={r.avatar} size={40} />
             <span className="min-w-0 flex-1">
               <span className="block truncate font-semibold text-white">
-                {r.name} {r.you && <span className="ml-1 rounded-full bg-cyan-300 px-2 py-0.5 text-[11px] font-bold text-night-950">{t('lb.you')}</span>}
+                {r.name} {r.you && <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-[11px] font-bold text-primary-fg">{t('lb.you')}</span>}
               </span>
               <span className="text-xs text-slate-500">{t('common.levelN', { n: levelForXp(r.xp) })}</span>
             </span>

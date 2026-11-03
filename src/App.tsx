@@ -3,12 +3,14 @@ import { ProfileProvider } from '@/features/profile/ProfileProvider';
 import { Toaster } from '@/components/Toaster';
 import { RewardToaster } from '@/components/RewardToaster';
 import { useMotionAttribute } from '@/hooks/useReducedMotion';
+import { useThemeAttribute } from '@/hooks/useTheme';
 import { useHtmlLang } from '@/i18n';
 import { router } from './router';
 
 function GlobalEffects() {
   useMotionAttribute();
   useHtmlLang();
+  useThemeAttribute();
   return null;
 }
 

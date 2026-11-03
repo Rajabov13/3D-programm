@@ -297,4 +297,10 @@ export const ru: Record<DictKey, string> = {
 
   'common.updated': "Сайт обновился",
   'common.updatedHint': "Перезагрузите страницу, чтобы загрузить новую версию.",
+
+  'nav.theme': "Сменить тему",
+  'settings.theme': "Оформление",
+  'settings.t.light': "Светлая",
+  'settings.t.dark': "Тёмная",
+  'settings.t.system': "Как на устройстве",
 };

@@ -14,6 +14,7 @@ import { useGame } from '@/game/store';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useL, useT } from '@/i18n';
 import { cn } from '@/lib/cn';
+import { accentInk } from '@/lib/accent';
 
 const KIND_ICON: Record<XpEvent['kind'], LucideIcon> = { stage: Star, boss: Swords, badge: Award, quest: Gift };
 
@@ -101,7 +102,7 @@ export default function ProfilePage() {
             const s = zoneStars(game, z);
             return (
               <li key={z.id} className="flex items-center gap-3">
-                <span className="grid h-9 w-12 shrink-0 place-items-center rounded-lg font-mono text-xs font-bold" style={{ background: `${z.accent}22`, color: z.accent }}>
+                <span className="grid h-9 w-12 shrink-0 place-items-center rounded-lg font-mono text-xs font-bold" style={{ background: `${z.accent}22`, color: accentInk(z.accent) }}>
                   {z.symbol}
                 </span>
                 <span className="w-40 shrink-0 truncate text-sm text-slate-300">{t(z.nameKey)}</span>

@@ -115,13 +115,13 @@ export function Switch({
         onClick={() => onChange(!checked)}
         className={cn(
           'focus-ring relative h-6 w-11 shrink-0 rounded-full border transition-colors disabled:opacity-50',
-          checked ? 'border-cyan-300/50 bg-cyan-400/70' : 'border-white/15 bg-white/10',
+          checked ? 'border-primary bg-primary' : 'border-white/20 bg-white/15',
         )}
       >
         <span
           // Explicit left/top: inside a <button> the default position of an absolute child is
           // browser-dependent (mobile browsers centre it), which pushed the knob out of the track.
-          className={cn('absolute left-0.5 top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform', checked ? 'translate-x-5' : 'translate-x-0')}
+          className={cn('absolute left-0.5 top-0.5 h-[18px] w-[18px] rounded-full bg-[#fff] shadow transition-transform', checked ? 'translate-x-5' : 'translate-x-0')}
         />
       </button>
     </div>

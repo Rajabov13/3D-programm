@@ -8,6 +8,7 @@ import { useGame } from '@/game/store';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useL, useT } from '@/i18n';
 import { cn } from '@/lib/cn';
+import { accentInk, ON_ACCENT } from '@/lib/accent';
 
 const OFFSETS = [0, 56, 84, 56, 0, -56, -84, -56];
 
@@ -48,7 +49,7 @@ export default function ZonePage() {
       </div>
 
       <header className="mb-10 text-center">
-        <span className="mx-auto grid h-20 w-20 place-items-center rounded-3xl font-mono text-2xl font-black" style={{ background: `${zone.accent}22`, color: zone.accent, boxShadow: `inset 0 0 0 2px ${zone.accent}66, 0 0 40px ${zone.accent}33` }}>
+        <span className="mx-auto grid h-20 w-20 place-items-center rounded-3xl font-mono text-2xl font-black" style={{ background: `${zone.accent}22`, color: accentInk(zone.accent), boxShadow: `inset 0 0 0 2px ${zone.accent}66` }}>
           {zone.symbol}
         </span>
         <h1 className="mt-4 text-3xl font-bold">{t(zone.nameKey)}</h1>
@@ -76,8 +77,8 @@ export default function ZonePage() {
                 className={cn(
                   'focus-ring relative grid h-20 w-20 place-items-center rounded-full border-4 text-2xl font-black transition-transform active:scale-95 disabled:cursor-not-allowed',
                   !open && 'border-white/10 bg-night-800 text-slate-600',
-                  open && best > 0 && 'text-night-950 shadow-[0_6px_0_rgba(0,0,0,0.35)] hover:scale-105',
-                  isCurrent && 'animate-float text-night-950 shadow-[0_6px_0_rgba(0,0,0,0.35)] hover:scale-105',
+                  open && best > 0 && cn(ON_ACCENT, 'shadow-[0_6px_0_rgba(0,0,0,0.25)] hover:scale-105'),
+                  isCurrent && cn(ON_ACCENT, 'animate-float shadow-[0_6px_0_rgba(0,0,0,0.25)] hover:scale-105'),
                 )}
                 style={open ? { background: zone.accent, borderColor: isCurrent ? '#ffffff' : `${zone.accent}` } : undefined}
               >
@@ -85,7 +86,7 @@ export default function ZonePage() {
                 {isCurrent && <span className="absolute -inset-2 animate-ping rounded-full border-2 border-white/40" aria-hidden />}
               </button>
               <Stars value={best} size={16} className="mt-2" />
-              <p className={cn('mt-1 max-w-[180px] text-center text-sm font-medium', open ? 'text-slate-200' : 'text-slate-600')}>{l(stage.title)}</p>
+              <p className={cn('mt-1 max-w-[180px] text-center text-sm font-medium', open ? 'text-slate-200' : 'text-slate-500')}>{l(stage.title)}</p>
             </li>
           );
         })}

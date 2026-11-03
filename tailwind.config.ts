@@ -1,38 +1,80 @@
 import type { Config } from 'tailwindcss';
+import defaults from 'tailwindcss/colors';
+import plugin from 'tailwindcss/plugin';
+
+/**
+ * Theme-aware colours. Every palette class (text-slate-400, bg-white/5, border-cyan-300/40 …)
+ * reads a CSS variable, so one set of class names serves both themes:
+ *  - dark: the normal Tailwind values;
+ *  - light: each scale is mirrored (50↔950, 100↔900, 200↔800, 300↔700, 400↔600) and
+ *    white ↔ ink, so “light text on dark” becomes “dark text on light” automatically.
+ * Any element can force a theme for its subtree with data-theme="dark" / "light"
+ * (the 3D city and the hero stay dark: they sit on a night scene).
+ * The brand colour is blue: the `cyan` scale used across the UI is mapped to Tailwind's blue.
+ */
+const PALETTES = ['slate', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'] as const;
+const SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
+const SOURCE: Record<(typeof PALETTES)[number], string> = Object.fromEntries(PALETTES.map((p) => [p, p === 'cyan' ? 'blue' : p])) as never;
+
+const rgb = (hex: string) => {
+  const h = hex.replace('#', '');
+  const n = parseInt(h.length === 3 ? h.replace(/./g, '$&$&') : h, 16);
+  return `${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255}`;
+};
+const palette = (name: string) => (defaults as unknown as Record<string, Record<number, string>>)[name];
+const ref = (name: string) => `rgb(var(--c-${name}) / <alpha-value>)`;
+
+/** Page and surface colours (the old “night” scale) and semantic tokens, per theme. */
+const SURFACES = {
+  dark: { 'night-950': '#0e1525', 'night-900': '#121b2e', 'night-850': '#162034', 'night-800': '#1a2539', 'night-700': '#233149', 'night-600': '#2e3d58', code: '#0b1220', primary: '#2563eb', 'primary-hover': '#3b82f6', 'on-primary': '#ffffff', white: '#ffffff', black: '#000000' },
+  light: { 'night-950': '#f5f7fb', 'night-900': '#ffffff', 'night-850': '#ffffff', 'night-800': '#ffffff', 'night-700': '#eef2f7', 'night-600': '#e2e8f0', code: '#f8fafc', primary: '#2563eb', 'primary-hover': '#1d4ed8', 'on-primary': '#ffffff', white: '#0f172a', black: '#ffffff' },
+} as const;
+
+const TWEAKS = {
+  dark: { 'slate-500': '#8391a7' },
+  light: { 'slate-500': '#56657b', 'amber-300': '#9a4a0a' },
+} as const;
+
+function themeVars(theme: 'dark' | 'light'): Record<string, string> {
+  const vars: Record<string, string> = {};
+  for (const p of PALETTES) {
+    const src = palette(SOURCE[p]);
+    for (let i = 0; i < SHADES.length; i++) {
+      const shade = theme === 'dark' ? SHADES[i] : SHADES[SHADES.length - 1 - i];
+      vars[`--c-${p}-${SHADES[i]}`] = rgb(src[shade]);
+    }
+  }
+  for (const [k, v] of Object.entries(SURFACES[theme])) vars[`--c-${k}`] = rgb(v);
+  // Readability tweaks (WCAG AA 4.5:1 for small text): muted grey and amber text.
+  for (const [k, v] of Object.entries(TWEAKS[theme])) vars[`--c-${k}`] = rgb(v);
+  return vars;
+}
+
+type ColorTree = { [key: string]: string | ColorTree };
+const colors: ColorTree = {
+  transparent: 'transparent',
+  current: 'currentColor',
+  inherit: 'inherit',
+  white: ref('white'),
+  black: ref('black'),
+  code: ref('code'),
+  primary: { DEFAULT: ref('primary'), hover: ref('primary-hover'), fg: ref('on-primary') },
+  night: Object.fromEntries([950, 900, 850, 800, 700, 600].map((s) => [s, ref(`night-${s}`)])),
+};
+for (const p of PALETTES) colors[p] = Object.fromEntries(SHADES.map((s) => [s, ref(`${p}-${s}`)]));
 
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
+    colors,
     extend: {
-      colors: {
-        night: {
-          950: '#03060d',
-          900: '#060b16',
-          850: '#0a1120',
-          800: '#0d1628',
-          700: '#142036',
-          600: '#1c2b46',
-        },
-        graphite: {
-          900: '#0f1115',
-          800: '#171a21',
-          700: '#22262f',
-          600: '#2e333e',
-        },
-        cyan: {
-          glow: '#5ce1ff',
-        },
-        accent: {
-          violet: '#8b7cf6',
-        },
-      },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       boxShadow: {
-        glass: '0 1px 0 0 rgba(255,255,255,0.06) inset, 0 20px 50px -20px rgba(0,0,0,0.6)',
-        glow: '0 0 0 1px rgba(92,225,255,0.25), 0 8px 30px -8px rgba(56,189,248,0.35)',
+        glass: 'var(--shadow-card)',
+        card: 'var(--shadow-card)',
       },
       backgroundImage: {
         'grid-faint':
@@ -74,5 +116,12 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(({ addBase }) => {
+      addBase({
+        ':root, [data-theme="dark"]': { ...themeVars('dark'), '--shadow-card': '0 1px 0 0 rgba(255,255,255,0.04) inset, 0 12px 32px -16px rgba(0,0,0,0.55)', '--ink-mix': '18%', colorScheme: 'dark' },
+        '[data-theme="light"]': { ...themeVars('light'), '--shadow-card': '0 1px 2px rgba(15,23,42,0.06), 0 8px 24px -12px rgba(15,23,42,0.14)', '--ink-mix': '42%', colorScheme: 'light' },
+      });
+    }),
+  ],
 } satisfies Config;

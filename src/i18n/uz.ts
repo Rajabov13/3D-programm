@@ -295,6 +295,12 @@ export const uz = {
 
   'common.updated': "Sayt yangilandi",
   'common.updatedHint': "Yangi versiyani yuklash uchun sahifani qayta yuklang.",
+
+  'nav.theme': "Mavzuni almashtirish",
+  'settings.theme': "Koʻrinish",
+  'settings.t.light': "Yorugʻ",
+  'settings.t.dark': "Qorongʻi",
+  'settings.t.system': "Qurilma boʻyicha",
 } as const;
 
 export type DictKey = keyof typeof uz;

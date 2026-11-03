@@ -1,11 +1,23 @@
 <!doctype html>
-<html lang="uz" class="dark">
+<html lang="uz" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#03060d" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#f5f7fb" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      // Apply the saved theme before the first paint (no light/dark flash).
+      (function () {
+        var theme = 'light';
+        try {
+          var saved = JSON.parse(localStorage.getItem('cw.settings.v1') || '{}').state || {};
+          theme = saved.theme || 'light';
+          if (theme === 'system') theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        } catch (e) {}
+        document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+      })();
+    </script>
     <meta
       name="description"
       content="3D Code World — oʻynab dasturlashni oʻrganing: HTML, CSS, Python, JavaScript, React. Учись программировать играя. Learn to code by playing."
