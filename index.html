@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="uz" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/3D-programm/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f2f4f5" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      // Apply the saved theme before the first paint (no light/dark flash).
+      (function () {
+        var theme = 'light';
+        try {
+          var saved = JSON.parse(localStorage.getItem('cw.settings.v1') || '{}').state || {};
+          theme = saved.theme || 'light';
+          if (theme === 'system') theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        } catch (e) {}
+        document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+      })();
+    </script>
+    <meta
+      name="description"
+      content="3D Code World — oʻynab dasturlashni oʻrganing: HTML, CSS, Python, JavaScript, React. Учись программировать играя. Learn to code by playing."
+    />
+    <title>3D Code World</title>
+    <script type="module" crossorigin src="/3D-programm/assets/index-PyFXmlK8.js"></script>
+    <link rel="modulepreload" crossorigin href="/3D-programm/assets/three-core-Cy1vprC-.js">
+    <link rel="stylesheet" crossorigin href="/3D-programm/assets/index-Bhv--bNr.css">
+  </head>
+  <body>
+    <noscript>3D Code World requires JavaScript to run.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

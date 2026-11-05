@@ -1,0 +1,11 @@
+# Netlify / Cloudflare Pages headers.
+# The code sandbox runs in an opaque-origin iframe, so the self-hosted Python runtime
+# must be fetchable cross-origin.
+/pyodide/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
