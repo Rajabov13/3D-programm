@@ -22,7 +22,7 @@ interface ProfileContextValue {
 const ProfileContext = createContext<ProfileContextValue | null>(null);
 
 const PROFILE_KEY = 'cw.demo.profile.v1';
-const defaultProfile: Profile = { displayName: 'Kodchi', avatar: 'nebula', showOnLeaderboard: true };
+const defaultProfile: Profile = { displayName: 'Kodchi', avatar: 'ember', showOnLeaderboard: true };
 
 export function readProfile(): Profile {
   return { ...defaultProfile, ...readJSON<Partial<Profile>>(PROFILE_KEY, {}) };

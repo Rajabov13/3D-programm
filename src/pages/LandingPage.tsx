@@ -34,7 +34,7 @@ function SkylinePoster() {
         {towers.map(([x, h]) => (
           <g key={x}>
             <rect x={x - 2.4} y={100 - h} width={4.8} height={h} fill="url(#tower)" />
-            <rect x={x - 2.4} y={100 - h} width={4.8} height={0.4} fill="#3b82f6" opacity="0.6" />
+            <rect x={x - 2.4} y={100 - h} width={4.8} height={0.4} style={{ fill: 'rgb(var(--c-slate-400))' }} opacity="0.6" />
           </g>
         ))}
       </svg>

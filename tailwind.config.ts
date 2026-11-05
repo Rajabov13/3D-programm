@@ -10,14 +10,15 @@ import plugin from 'tailwindcss/plugin';
  *    white ↔ ink, so “light text on dark” becomes “dark text on light” automatically.
  * Any element can force a theme for its subtree with data-theme="dark" / "light"
  * (the 3D city and the hero stay dark: they sit on a night scene).
- * Brand: blue on light (the `cyan` scale maps to blue). Dark mode follows Roblox's flat, monochrome
- * look: neutral greys only (cyan/sky/slate → neutral), #232527 page, flat tiles, white primary buttons.
+ * Both themes follow Roblox's flat, monochrome look: neutral greys only (cyan/sky/slate → neutral),
+ * no blue or green brand colour. Light: #f2f4f5 page, white tiles, black buttons. Dark: #232527 page,
+ * flat tiles, white buttons.
  */
 const PALETTES = ['slate', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'] as const;
 const SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
 /** Which Tailwind scale feeds each class name, per theme: light = slate greys + blue brand, dark = neutral greys + green brand. */
 const SOURCE: Record<'dark' | 'light', Record<string, string>> = {
-  light: { cyan: 'blue' },
+  light: { cyan: 'neutral', sky: 'neutral', slate: 'neutral' },
   dark: { cyan: 'neutral', sky: 'neutral', slate: 'neutral' },
 };
 
@@ -32,12 +33,12 @@ const ref = (name: string) => `rgb(var(--c-${name}) / <alpha-value>)`;
 /** Page and surface colours (the old “night” scale) and semantic tokens, per theme. */
 const SURFACES = {
   dark: { 'night-950': '#232527', 'night-900': '#191b1d', 'night-850': '#2a2c2e', 'night-800': '#2d2f31', 'night-700': '#393b3d', 'night-600': '#4a4c4f', code: '#191b1d', primary: '#ffffff', 'primary-hover': '#e2e2e2', 'on-primary': '#191b1d', 'brand-text': '#bdbebe', white: '#ffffff', black: '#000000' },
-  light: { 'night-950': '#f5f7fb', 'night-900': '#ffffff', 'night-850': '#ffffff', 'night-800': '#ffffff', 'night-700': '#eef2f7', 'night-600': '#e2e8f0', code: '#f8fafc', primary: '#2563eb', 'primary-hover': '#1d4ed8', 'on-primary': '#ffffff', 'brand-text': '#2563eb', white: '#0f172a', black: '#ffffff' },
+  light: { 'night-950': '#f2f4f5', 'night-900': '#ffffff', 'night-850': '#ffffff', 'night-800': '#ffffff', 'night-700': '#ebedee', 'night-600': '#dfe1e2', code: '#f7f7f8', primary: '#191b1d', 'primary-hover': '#393b3d', 'on-primary': '#ffffff', 'brand-text': '#606265', white: '#191b1d', black: '#ffffff' },
 } as const;
 
 const TWEAKS = {
   dark: { 'slate-500': '#a3a4a5' },
-  light: { 'slate-500': '#56657b', 'amber-300': '#9a4a0a' },
+  light: { 'slate-500': '#5e6063', 'amber-300': '#9a4a0a' },
 } as const;
 
 function themeVars(theme: 'dark' | 'light'): Record<string, string> {

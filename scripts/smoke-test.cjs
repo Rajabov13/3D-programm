@@ -284,7 +284,7 @@ const xpOf = async (page) => {
     await page.getByRole('heading', { name: 'Olamlar', level: 1 }).waitFor();
     const themeOf = () => page.evaluate(() => document.documentElement.dataset.theme);
     const bodyBg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    ok((await themeOf()) === 'light' && (await bodyBg()) === 'rgb(245, 247, 251)', 'the site opens in the light theme by default');
+    ok((await themeOf()) === 'light' && (await bodyBg()) === 'rgb(242, 244, 245)', 'the site opens in the light theme by default');
     await page.getByRole('button', { name: /Mavzuni almashtirish/ }).click();
     ok((await themeOf()) === 'dark' && (await bodyBg()) === 'rgb(35, 37, 39)', 'the navbar button switches to the dark theme');
     await page.reload();
