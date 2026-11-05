@@ -286,7 +286,7 @@ const xpOf = async (page) => {
     const bodyBg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     ok((await themeOf()) === 'light' && (await bodyBg()) === 'rgb(245, 247, 251)', 'the site opens in the light theme by default');
     await page.getByRole('button', { name: /Mavzuni almashtirish/ }).click();
-    ok((await themeOf()) === 'dark' && (await bodyBg()) === 'rgb(18, 18, 18)', 'the navbar button switches to the dark theme');
+    ok((await themeOf()) === 'dark' && (await bodyBg()) === 'rgb(35, 37, 39)', 'the navbar button switches to the dark theme');
     await page.reload();
     await page.getByRole('heading', { name: 'Olamlar', level: 1 }).waitFor();
     ok((await themeOf()) === 'dark', 'the theme is remembered after a reload (no flash: set before React starts)');

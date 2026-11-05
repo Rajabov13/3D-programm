@@ -10,15 +10,15 @@ import plugin from 'tailwindcss/plugin';
  *    white ↔ ink, so “light text on dark” becomes “dark text on light” automatically.
  * Any element can force a theme for its subtree with data-theme="dark" / "light"
  * (the 3D city and the hero stay dark: they sit on a night scene).
- * Brand: blue on light (the `cyan` scale maps to blue); a neutral charcoal with a terminal-green
- * accent on dark (cyan → green, slate → neutral, so no navy tint).
+ * Brand: blue on light (the `cyan` scale maps to blue). Dark mode follows Roblox's flat, monochrome
+ * look: neutral greys only (cyan/sky/slate → neutral), #232527 page, flat tiles, white primary buttons.
  */
 const PALETTES = ['slate', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'] as const;
 const SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
 /** Which Tailwind scale feeds each class name, per theme: light = slate greys + blue brand, dark = neutral greys + green brand. */
 const SOURCE: Record<'dark' | 'light', Record<string, string>> = {
   light: { cyan: 'blue' },
-  dark: { cyan: 'green', slate: 'neutral', sky: 'teal' },
+  dark: { cyan: 'neutral', sky: 'neutral', slate: 'neutral' },
 };
 
 const rgb = (hex: string) => {
@@ -31,12 +31,12 @@ const ref = (name: string) => `rgb(var(--c-${name}) / <alpha-value>)`;
 
 /** Page and surface colours (the old “night” scale) and semantic tokens, per theme. */
 const SURFACES = {
-  dark: { 'night-950': '#121212', 'night-900': '#171717', 'night-850': '#1b1b1b', 'night-800': '#1e1e1e', 'night-700': '#282828', 'night-600': '#333333', code: '#0e0e0e', primary: '#4ade80', 'primary-hover': '#86efac', 'on-primary': '#06210f', white: '#f4f4f5', black: '#000000' },
-  light: { 'night-950': '#f5f7fb', 'night-900': '#ffffff', 'night-850': '#ffffff', 'night-800': '#ffffff', 'night-700': '#eef2f7', 'night-600': '#e2e8f0', code: '#f8fafc', primary: '#2563eb', 'primary-hover': '#1d4ed8', 'on-primary': '#ffffff', white: '#0f172a', black: '#ffffff' },
+  dark: { 'night-950': '#232527', 'night-900': '#191b1d', 'night-850': '#2a2c2e', 'night-800': '#2d2f31', 'night-700': '#393b3d', 'night-600': '#4a4c4f', code: '#191b1d', primary: '#ffffff', 'primary-hover': '#e2e2e2', 'on-primary': '#191b1d', 'brand-text': '#bdbebe', white: '#ffffff', black: '#000000' },
+  light: { 'night-950': '#f5f7fb', 'night-900': '#ffffff', 'night-850': '#ffffff', 'night-800': '#ffffff', 'night-700': '#eef2f7', 'night-600': '#e2e8f0', code: '#f8fafc', primary: '#2563eb', 'primary-hover': '#1d4ed8', 'on-primary': '#ffffff', 'brand-text': '#2563eb', white: '#0f172a', black: '#ffffff' },
 } as const;
 
 const TWEAKS = {
-  dark: { 'slate-500': '#8f8f8f' },
+  dark: { 'slate-500': '#a3a4a5' },
   light: { 'slate-500': '#56657b', 'amber-300': '#9a4a0a' },
 } as const;
 
@@ -124,7 +124,7 @@ export default {
   plugins: [
     plugin(({ addBase }) => {
       addBase({
-        ':root, [data-theme="dark"]': { ...themeVars('dark'), '--shadow-card': '0 1px 0 0 rgba(255,255,255,0.04) inset, 0 12px 32px -16px rgba(0,0,0,0.55)', '--ink-mix': '18%', colorScheme: 'dark' },
+        ':root, [data-theme="dark"]': { ...themeVars('dark'), '--shadow-card': 'none', '--ink-mix': '18%', colorScheme: 'dark' },
         '[data-theme="light"]': { ...themeVars('light'), '--shadow-card': '0 1px 2px rgba(15,23,42,0.06), 0 8px 24px -12px rgba(15,23,42,0.14)', '--ink-mix': '42%', colorScheme: 'light' },
       });
     }),

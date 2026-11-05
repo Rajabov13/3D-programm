@@ -21,7 +21,7 @@ function rulesFor(lang: CodeLanguage): Rule[] {
     case 'jsx':
       return [
         { re: /\/\/[^\n]*|\/\*[\s\S]*?\*\//y, cls: 'text-slate-500 italic' },
-        { re: /`(?:\\[\s\S]|[^`\\])*`|'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"/y, cls: 'text-emerald-300' },
+        { re: /`(?:\\[\s\S]|[^`\\])*`|'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"/y, cls: 'text-orange-300' },
         { re: /<\/?[A-Za-z][\w.]*/y, cls: 'text-sky-300' },
         { re: new RegExp(`\\b(?:${JS_KEYWORDS})\\b`, 'y'), cls: 'text-violet-300' },
         { re: /\b\d+(?:\.\d+)?\b/y, cls: 'text-amber-300' },
@@ -30,7 +30,7 @@ function rulesFor(lang: CodeLanguage): Rule[] {
     case 'python':
       return [
         { re: /#[^\n]*/y, cls: 'text-slate-500 italic' },
-        { re: /[fr]?("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')/y, cls: 'text-emerald-300' },
+        { re: /[fr]?("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')/y, cls: 'text-orange-300' },
         { re: new RegExp(`\\b(?:${PY_KEYWORDS})\\b`, 'y'), cls: 'text-violet-300' },
         { re: /\b\d+(?:\.\d+)?\b/y, cls: 'text-amber-300' },
         { re: /\b[A-Za-z_]\w*(?=\s*\()/y, cls: 'text-cyan-200' },
@@ -42,7 +42,7 @@ function rulesFor(lang: CodeLanguage): Rule[] {
         { re: /[\w-]+(?=\s*:[^;{}]*;)/y, cls: 'text-sky-300' },
         { re: /#[0-9a-fA-F]{3,8}\b|\b\d*\.?\d+(?:px|rem|em|%|fr|vw|vh|ch|s|ms)?\b/y, cls: 'text-amber-300' },
         { re: /[.#][\w-]+/y, cls: 'text-cyan-200' },
-        { re: /"[^"\n]*"|'[^'\n]*'/y, cls: 'text-emerald-300' },
+        { re: /"[^"\n]*"|'[^'\n]*'/y, cls: 'text-orange-300' },
       ];
     case 'html':
       return [
@@ -51,7 +51,7 @@ function rulesFor(lang: CodeLanguage): Rule[] {
         { re: /<\/?[a-zA-Z][\w-]*/y, cls: 'text-sky-300' },
         { re: /\/?>/y, cls: 'text-sky-300' },
         { re: /\b[a-zA-Z-:]+(?==)/y, cls: 'text-violet-300' },
-        { re: /"[^"]*"|'[^']*'/y, cls: 'text-emerald-300' },
+        { re: /"[^"]*"|'[^']*'/y, cls: 'text-orange-300' },
       ];
     default:
       return [];
