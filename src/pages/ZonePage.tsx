@@ -99,7 +99,7 @@ export default function ZonePage() {
             aria-label={`${t('zone.boss')}: ${l(zone.boss.name)}`}
             className={cn(
               'focus-ring grid h-28 w-28 place-items-center rounded-[2rem] border-4 transition-transform active:scale-95 disabled:cursor-not-allowed',
-              bossOpen ? 'border-rose-300 bg-gradient-to-br from-rose-500 to-violet-600 text-white shadow-[0_8px_0_rgba(0,0,0,0.4)] hover:scale-105' : 'border-white/10 bg-night-800 text-slate-600',
+              bossOpen ? 'border-rose-300 bg-rose-600 text-[#fff] shadow-[0_8px_0_rgba(0,0,0,0.4)] hover:scale-105' : 'border-white/10 bg-night-800 text-slate-600',
               bossOpen && !defeated && 'animate-float',
             )}
           >

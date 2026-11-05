@@ -10,11 +10,16 @@ import plugin from 'tailwindcss/plugin';
  *    white ↔ ink, so “light text on dark” becomes “dark text on light” automatically.
  * Any element can force a theme for its subtree with data-theme="dark" / "light"
  * (the 3D city and the hero stay dark: they sit on a night scene).
- * The brand colour is blue: the `cyan` scale used across the UI is mapped to Tailwind's blue.
+ * Brand: blue on light (the `cyan` scale maps to blue); a neutral charcoal with a terminal-green
+ * accent on dark (cyan → green, slate → neutral, so no navy tint).
  */
 const PALETTES = ['slate', 'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'] as const;
 const SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
-const SOURCE: Record<(typeof PALETTES)[number], string> = Object.fromEntries(PALETTES.map((p) => [p, p === 'cyan' ? 'blue' : p])) as never;
+/** Which Tailwind scale feeds each class name, per theme: light = slate greys + blue brand, dark = neutral greys + green brand. */
+const SOURCE: Record<'dark' | 'light', Record<string, string>> = {
+  light: { cyan: 'blue' },
+  dark: { cyan: 'green', slate: 'neutral', sky: 'teal' },
+};
 
 const rgb = (hex: string) => {
   const h = hex.replace('#', '');
@@ -26,19 +31,19 @@ const ref = (name: string) => `rgb(var(--c-${name}) / <alpha-value>)`;
 
 /** Page and surface colours (the old “night” scale) and semantic tokens, per theme. */
 const SURFACES = {
-  dark: { 'night-950': '#0e1525', 'night-900': '#121b2e', 'night-850': '#162034', 'night-800': '#1a2539', 'night-700': '#233149', 'night-600': '#2e3d58', code: '#0b1220', primary: '#2563eb', 'primary-hover': '#3b82f6', 'on-primary': '#ffffff', white: '#ffffff', black: '#000000' },
+  dark: { 'night-950': '#121212', 'night-900': '#171717', 'night-850': '#1b1b1b', 'night-800': '#1e1e1e', 'night-700': '#282828', 'night-600': '#333333', code: '#0e0e0e', primary: '#4ade80', 'primary-hover': '#86efac', 'on-primary': '#06210f', white: '#f4f4f5', black: '#000000' },
   light: { 'night-950': '#f5f7fb', 'night-900': '#ffffff', 'night-850': '#ffffff', 'night-800': '#ffffff', 'night-700': '#eef2f7', 'night-600': '#e2e8f0', code: '#f8fafc', primary: '#2563eb', 'primary-hover': '#1d4ed8', 'on-primary': '#ffffff', white: '#0f172a', black: '#ffffff' },
 } as const;
 
 const TWEAKS = {
-  dark: { 'slate-500': '#8391a7' },
+  dark: { 'slate-500': '#8f8f8f' },
   light: { 'slate-500': '#56657b', 'amber-300': '#9a4a0a' },
 } as const;
 
 function themeVars(theme: 'dark' | 'light'): Record<string, string> {
   const vars: Record<string, string> = {};
   for (const p of PALETTES) {
-    const src = palette(SOURCE[p]);
+    const src = palette(SOURCE[theme][p] ?? p);
     for (let i = 0; i < SHADES.length; i++) {
       const shade = theme === 'dark' ? SHADES[i] : SHADES[SHADES.length - 1 - i];
       vars[`--c-${p}-${SHADES[i]}`] = rgb(src[shade]);

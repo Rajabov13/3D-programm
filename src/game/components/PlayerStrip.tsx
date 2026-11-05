@@ -19,7 +19,7 @@ export function PlayerStrip() {
     <Link to="/profile" className="focus-ring glass-strong flex flex-wrap items-center gap-4 rounded-3xl p-4 transition-colors hover:border-white/20 sm:p-5">
       <div className="relative">
         <Avatar preset={profile.avatar} size={56} />
-        <span className="absolute -bottom-1 -right-1 grid h-7 min-w-7 place-items-center rounded-full border-2 border-night-900 bg-gradient-to-br from-cyan-300 to-violet-400 px-1 text-xs font-black text-night-950">
+        <span className="absolute -bottom-1 -right-1 grid h-7 min-w-7 place-items-center rounded-full border-2 border-night-900 bg-primary px-1 text-xs font-black text-primary-fg">
           {lp.level}
         </span>
       </div>

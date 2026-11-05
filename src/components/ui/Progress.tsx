@@ -18,7 +18,7 @@ export function ProgressBar({
   const ratio = max > 0 ? Math.min(1, Math.max(0, value / max)) : 0;
   const fill = {
     // Mid-tone fills: the same look in the light and the dark theme.
-    cyan: 'from-[#3b82f6] to-[#2563eb]',
+    cyan: 'from-primary to-primary',
     violet: 'from-[#8b5cf6] to-[#6366f1]',
     green: 'from-[#34d399] to-[#10b981]',
     amber: 'from-[#fbbf24] to-[#f97316]',

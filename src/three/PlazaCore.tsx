@@ -2,16 +2,18 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useAccentMaterial, useCityMaterials, useGlowMaterial } from './materials';
+import { useScenePalette } from './scenePalette';
 
 export const PLAZA_CORE_RADIUS = 3.4;
 
 /** Central holographic monument of the plaza. */
 export function PlazaCore({ animate, shadows }: { animate: boolean; shadows: boolean }) {
   const { metal, dark } = useCityMaterials();
-  const cyan = useAccentMaterial('#5ce1ff', 2.4);
-  const violet = useAccentMaterial('#8b7cf6', 2);
-  const beam = useGlowMaterial('#38d6ff', 0.12);
-  const wire = useGlowMaterial('#5ce1ff', 0.5);
+  const { lights } = useScenePalette();
+  const cyan = useAccentMaterial(lights.primary, 2.4);
+  const violet = useAccentMaterial(lights.secondary, 2);
+  const beam = useGlowMaterial(lights.primary, 0.12);
+  const wire = useGlowMaterial(lights.primary, 0.5);
   const rings = useRef<THREE.Group>(null);
   const core = useRef<THREE.Mesh>(null);
   useFrame(({ clock }, dt) => {

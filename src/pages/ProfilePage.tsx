@@ -73,7 +73,7 @@ export default function ProfilePage() {
       <section className="glass-strong flex flex-wrap items-center gap-5 rounded-3xl p-6">
         <div className="relative">
           <Avatar preset={profile.avatar} size={88} label={profile.displayName} />
-          <span className="absolute -bottom-1 -right-1 grid h-9 min-w-9 place-items-center rounded-full border-[3px] border-night-900 bg-gradient-to-br from-cyan-300 to-violet-400 px-1 text-sm font-black text-night-950">
+          <span className="absolute -bottom-1 -right-1 grid h-9 min-w-9 place-items-center rounded-full border-[3px] border-night-900 bg-primary px-1 text-sm font-black text-primary-fg">
             {lp.level}
           </span>
         </div>

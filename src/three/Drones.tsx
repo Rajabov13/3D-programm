@@ -2,6 +2,7 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { seededRandom } from '@/lib/random';
+import { useScenePalette } from './scenePalette';
 
 /** Small light-trail vehicles circling the skyline — one instanced draw call. */
 export function Drones({ count, animate }: { count: number; animate: boolean }) {
@@ -17,7 +18,8 @@ export function Drones({ count, animate }: { count: number; animate: boolean }) 
     }));
   }, [count]);
   const geometry = useMemo(() => new THREE.CapsuleGeometry(0.18, 1.4, 4, 8).rotateZ(Math.PI / 2), []);
-  const material = useMemo(() => new THREE.MeshBasicMaterial({ color: '#9be7ff', toneMapped: false }), []);
+  const { lights } = useScenePalette();
+  const material = useMemo(() => new THREE.MeshBasicMaterial({ color: lights.primary, toneMapped: false }), [lights.primary]);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const time = useRef(0);
 

@@ -6,8 +6,8 @@ export function LogoMark({ className }: { className?: string }) {
     <svg viewBox="0 0 64 64" className={cn('h-8 w-8 text-white', className)} aria-hidden>
       <defs>
         <linearGradient id="cw-logo" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#3b82f6" />
-          <stop offset="1" stopColor="#6366f1" />
+          <stop offset="0" style={{ stopColor: 'rgb(var(--c-primary))' }} />
+          <stop offset="1" style={{ stopColor: 'rgb(var(--c-primary-hover))' }} />
         </linearGradient>
       </defs>
       <path d="M32 6 56 19.5v25L32 58 8 44.5v-25Z" fill="url(#cw-logo)" fillOpacity="0.1" stroke="url(#cw-logo)" strokeWidth="3" strokeLinejoin="round" />

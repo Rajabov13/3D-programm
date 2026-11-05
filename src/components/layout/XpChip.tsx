@@ -16,7 +16,7 @@ export function XpChip() {
       className="focus-ring group flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] py-1 pl-1 pr-3 hover:border-cyan-300/30"
       aria-label={`${t('common.levelN', { n: lp.level })} · ${game.xp} XP · ${t('common.xpToNext', { n: lp.toNext })} · ${t('profile.streak')}: ${days}`}
     >
-      <span className="grid h-7 min-w-7 place-items-center rounded-full bg-gradient-to-br from-cyan-300 to-violet-400 px-1.5 text-[12px] font-black text-night-950">{lp.level}</span>
+      <span className="grid h-7 min-w-7 place-items-center rounded-full bg-primary px-1.5 text-[12px] font-black text-primary-fg">{lp.level}</span>
       <span className="hidden flex-col sm:flex">
         <span className="text-[12px] font-bold leading-none text-white">{game.xp} XP</span>
         <span className="mt-1 h-1 w-14 overflow-hidden rounded-full bg-white/10">

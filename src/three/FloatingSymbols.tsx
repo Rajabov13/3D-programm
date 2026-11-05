@@ -4,11 +4,13 @@ import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { seededRandom } from '@/lib/random';
 import { MONO_FONT_URL } from './HoloSign';
+import { useScenePalette } from './scenePalette';
 
 const GLYPHS = ['</>', '{ }', '=>', '( )', '[ ]', '#', 'def', 'const', '&&', '++', 'fn', '<div>', ';', '!==', '?:', 'useState', 'print()', '0x1F', '::', '%'];
 
 /** Programming symbols drifting above the plaza. All animated from a single frame callback. */
 export function FloatingSymbols({ count, animate }: { count: number; animate: boolean }) {
+  const { lights } = useScenePalette();
   const refs = useRef<Array<THREE.Object3D | null>>([]);
   const items = useMemo(() => {
     const rand = seededRandom(2024);
@@ -23,7 +25,7 @@ export function FloatingSymbols({ count, animate }: { count: number; animate: bo
         speed: 0.3 + rand() * 0.5,
         phase: rand() * Math.PI * 2,
         size: 0.6 + rand() * 0.7,
-        color: rand() < 0.65 ? '#7fe7ff' : '#b4a8ff',
+        primary: rand() < 0.65,
       };
     });
   }, [count]);
@@ -49,7 +51,7 @@ export function FloatingSymbols({ count, animate }: { count: number; animate: bo
           font={MONO_FONT_URL}
           position={[it.x, it.y, it.z]}
           fontSize={it.size}
-          color={it.color}
+          color={it.primary ? lights.primary : lights.secondary}
           fillOpacity={0.55}
           anchorX="center"
           anchorY="middle"

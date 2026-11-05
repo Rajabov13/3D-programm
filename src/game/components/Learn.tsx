@@ -89,7 +89,7 @@ export function TerminalMock({ lines }: { lines: string[] }) {
   const t = useT();
   return (
     // Terminals stay dark in both themes.
-    <div data-theme="dark" className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1220]">
+    <div data-theme="dark" className="overflow-hidden rounded-2xl border border-white/10 bg-[#0e0e0e]">
       <div className="flex items-center gap-1.5 border-b border-white/[0.06] px-3 py-1.5 text-[11px] font-semibold text-emerald-300/80">
         <Terminal className="h-3.5 w-3.5" aria-hidden /> {t('editor.console')}
       </div>

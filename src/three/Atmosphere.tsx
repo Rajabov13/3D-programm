@@ -98,8 +98,8 @@ export function Lighting({ preset, palette }: { preset: QualityPreset; palette: 
         shadow-bias={-0.0004}
         shadow-normalBias={0.04}
       />
-      <pointLight position={[0, 6, 0]} intensity={60 * palette.neon} distance={40} color="#38d6ff" decay={2} />
-      <pointLight position={[-18, 10, -18]} intensity={40 * palette.neon} distance={45} color="#8b7cf6" decay={2} />
+      <pointLight position={[0, 6, 0]} intensity={60 * palette.neon} distance={40} color={palette.lights.primary} decay={2} />
+      <pointLight position={[-18, 10, -18]} intensity={40 * palette.neon} distance={45} color={palette.lights.secondary} decay={2} />
       {preset.environment && (
         // Procedural reflection environment rendered once — no HDR download. Re-rendered when day ↔ night.
         <Environment key={palette.day ? 'day' : 'night'} resolution={128} frames={1} background={false}>
